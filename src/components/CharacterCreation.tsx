@@ -73,37 +73,43 @@ const CharacterCreation = ({ onCharacterCreated }: CharacterCreationProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-slate-800/90 backdrop-blur-lg border-slate-700">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white/90 backdrop-blur-lg border-slate-200 shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-white">Create Your Life</CardTitle>
-          <p className="text-slate-300">Start your journey</p>
+          <CardTitle className="text-2xl font-bold text-slate-800">Create Your Life</CardTitle>
+          <p className="text-slate-600">Start your journey</p>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Name</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
-              className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400"
+              className="bg-white/80 border-slate-300 text-slate-800 placeholder-slate-500"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Gender</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Gender</label>
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant={gender === 'male' ? 'default' : 'outline'}
                 onClick={() => setGender('male')}
-                className="bg-blue-600 hover:bg-blue-700 border-blue-500"
+                className={gender === 'male' 
+                  ? "bg-blue-500 hover:bg-blue-600 text-white" 
+                  : "bg-white/80 hover:bg-white border-slate-300 text-slate-700"
+                }
               >
                 Male
               </Button>
               <Button
                 variant={gender === 'female' ? 'default' : 'outline'}
                 onClick={() => setGender('female')}
-                className="bg-pink-600 hover:bg-pink-700 border-pink-500"
+                className={gender === 'female' 
+                  ? "bg-pink-500 hover:bg-pink-600 text-white" 
+                  : "bg-white/80 hover:bg-white border-slate-300 text-slate-700"
+                }
               >
                 Female
               </Button>
@@ -113,7 +119,7 @@ const CharacterCreation = ({ onCharacterCreated }: CharacterCreationProps) => {
           <Button
             onClick={createCharacter}
             disabled={!name.trim()}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
           >
             Start Life
           </Button>
