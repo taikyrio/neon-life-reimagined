@@ -14,7 +14,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
+    <div className="min-h-screen bg-slate-900">
       {!gameStarted ? (
         <CharacterCreation onCharacterCreated={handleCharacterCreated} />
       ) : (

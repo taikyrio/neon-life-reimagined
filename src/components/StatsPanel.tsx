@@ -23,9 +23,9 @@ const StatBar = ({ label, value, color }: { label: string; value: number; color:
 
 const StatsPanel = ({ character }: StatsPanelProps) => {
   return (
-    <Card className="bg-slate-800/90 backdrop-blur-lg border-slate-700">
+    <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
-        <CardTitle className="text-white text-center">Stats</CardTitle>
+        <CardTitle className="text-white text-center">Character Stats</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <StatBar label="Health" value={character.health} color="bg-green-500" />
