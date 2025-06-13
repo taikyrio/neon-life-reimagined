@@ -1,0 +1,28 @@
+
+-- Solar2D Build Settings
+settings = {
+    orientation = {
+        default = "portrait",
+        supported = { "portrait" }
+    },
+    
+    android = {
+        usesPermissions = {
+            "android.permission.INTERNET",
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+        },
+    },
+    
+    iphone = {
+        xcassets = "Images.xcassets",
+        plist = {
+            UIStatusBarHidden = true,
+            UILaunchStoryboardName = "LaunchScreen",
+        },
+    },
+    
+    excludeFiles = {
+        all = { "Icon.png", "Icon-*dpi.png", "Images.xcassets", },
+        android = { "LaunchScreen.storyboardc", },
+    },
+}
