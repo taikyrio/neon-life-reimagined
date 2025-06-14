@@ -24,13 +24,12 @@ const BottomNavigation = ({ activeTab, setActiveTab }: BottomNavigationProps) =>
             onClick={() => setActiveTab(item.id as any)}
             className={`flex flex-col items-center p-2 rounded-xl transition-all duration-300 flex-1 max-w-20 fluent-hover
               ${ activeTab === item.id
-                  ? 'win11-button text-white shadow-lg scale-105'
+                  ? 'win11-button text-white shadow-lg scale-110 bg-blue-500/90'
                   : 'text-white/60 hover:text-white hover:bg-white/10 ios-button'
               }`}
             title={item.label}
           >
-            <item.icon size={20} />
-            <span className="text-[10px] mt-1 font-medium leading-tight">{item.label}</span>
+            <item.icon size={28} />
           </button>
         ))}
       </div>

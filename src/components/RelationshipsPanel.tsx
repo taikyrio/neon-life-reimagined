@@ -13,7 +13,7 @@ const RelationshipsPanel = ({ character, setCharacter }: RelationshipsPanelProps
   const interactWithFamily = (memberId: string, action: 'compliment' | 'insult' | 'spend_time') => {
     const newCharacter = { ...character };
     const member = newCharacter.family.find(f => f.id === memberId);
-    
+
     if (!member) return;
 
     let relationshipChange = 0;
@@ -35,7 +35,7 @@ const RelationshipsPanel = ({ character, setCharacter }: RelationshipsPanelProps
     }
 
     member.relationshipLevel = Math.max(0, Math.min(100, member.relationshipLevel + relationshipChange));
-    
+
     newCharacter.lifeEvents.push({
       id: Math.random().toString(36).substr(2, 9),
       year: character.birthYear + character.age,
@@ -88,7 +88,7 @@ const RelationshipsPanel = ({ character, setCharacter }: RelationshipsPanelProps
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   size="sm"
@@ -117,34 +117,6 @@ const RelationshipsPanel = ({ character, setCharacter }: RelationshipsPanelProps
               </div>
             </div>
           ))}
-        </CardContent>
-      </Card>
-
-      {/* Friends */}
-      <Card className="bg-slate-800/90 backdrop-blur-lg border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-white">Friends & Relationships</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {character.relationships.length === 0 ? (
-            <p className="text-slate-400 text-center py-4">No friends or relationships yet</p>
-          ) : (
-            <div className="space-y-3">
-              {character.relationships.map((rel) => (
-                <div key={rel.id} className="p-3 bg-slate-700/30 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h4 className="text-white font-medium">{rel.name}</h4>
-                      <p className="text-slate-400 text-sm capitalize">{rel.type} • Age {rel.age}</p>
-                    </div>
-                    <span className={`text-sm ${getRelationshipColor(rel.relationshipLevel)}`}>
-                      {rel.relationshipLevel}%
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

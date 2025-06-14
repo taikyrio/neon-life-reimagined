@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Character } from '../types/Character';
 import { Toaster } from "@/components/ui/toaster";
@@ -11,6 +10,7 @@ import AssetsPanel from './AssetsPanel';
 import ProfileView from './ProfileView';
 import SocialActivitiesPanel from './SocialActivitiesPanel';
 import LifeStageActions from './LifeStageActions';
+import RelationshipsPanel from './RelationshipsPanel';
 
 interface GameInterfaceProps {
   character: Character;
@@ -46,7 +46,7 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
       case 'assets':
         return <AssetsPanel character={character} onAction={handleLifeStageAction} />;
       case 'relationships':
-        return <SocialActivitiesPanel character={character} onAction={handleLifeStageAction} />;
+        return <RelationshipsPanel character={character} setCharacter={setCharacter} />;
       case 'profile':
         return <ProfileView character={character} />;
       default:
