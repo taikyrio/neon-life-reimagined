@@ -25,9 +25,9 @@ const TimelineView = ({
   const netMonthlyCashflow = Math.floor(yearlySalary / 12) + monthlyAssetIncome - monthlyExpenses;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto pb-20 space-y-3 px-2">
+      <div className="flex-1 overflow-y-auto pb-24 space-y-3 px-2">
         {/* Character Stats - Mobile Optimized */}
         <div className="mica-card p-4 border border-white/10">
           <div className="text-center mb-4">
@@ -119,8 +119,8 @@ const TimelineView = ({
         </div>
       </div>
 
-      {/* Fixed Age Up Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pt-4 pb-2 px-2 safe-area-bottom">
+      {/* Fixed Age Up Button - Always visible at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pt-4 pb-4 px-2">
         <Button
           onClick={onAgeUp}
           className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 text-lg font-semibold rounded-xl shadow-xl transform hover:scale-105 transition-transform duration-150"
