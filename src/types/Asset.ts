@@ -1,5 +1,3 @@
-
-```typescript
 export interface Asset {
   id: string;
   name: string;
@@ -88,4 +86,3 @@ export const ASSET_OPTIONS: Asset[] = [
     volatility: 0.1,
   }
 ];
-```

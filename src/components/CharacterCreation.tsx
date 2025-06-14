@@ -1,133 +1,136 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 import { Character } from '../types/Character';
 
 interface CharacterCreationProps {
-  onCharacterCreated: (character: Character) => void;
+  onCharacterCreate: (character: Character) => void;
 }
 
-const CharacterCreation = ({ onCharacterCreated }: CharacterCreationProps) => {
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  gender: z.enum(['male', 'female']),
+})
+
+const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacterCreate }) => {
   const [name, setName] = useState('');
   const [gender, setGender] = useState<'male' | 'female'>('male');
+  const router = useRouter();
 
-  const generateRandomStats = () => ({
-    health: Math.floor(Math.random() * 50) + 50,
-    happiness: Math.floor(Math.random() * 50) + 50,
-    smartness: Math.floor(Math.random() * 50) + 50,
-    appearance: Math.floor(Math.random() * 50) + 50,
-    fitness: Math.floor(Math.random() * 50) + 50,
-  });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      gender: "male",
+    },
+  })
 
-  const createCharacter = () => {
-    if (!name.trim()) return;
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+  }
 
-    const stats = generateRandomStats();
-    const birthYear = new Date().getFullYear();
-    
-    const character: Character = {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const birthYear = new Date().getFullYear() - 18; // Assume starting age is 18
+
+    const newCharacter: Character = {
       id: Math.random().toString(36).substr(2, 9),
-      name: name.trim(),
-      age: 0,
-      gender,
-      birthYear,
-      ...stats,
-      money: 0,
-      education: 'None',
+      name: name,
+      age: 18,
+      gender: gender,
+      birthYear: birthYear,
+      health: Math.floor(Math.random() * 31) + 70, // 70-100
+      happiness: Math.floor(Math.random() * 31) + 70, // 70-100
+      smartness: Math.floor(Math.random() * 51) + 50, // 50-100
+      appearance: Math.floor(Math.random() * 51) + 50, // 50-100
+      fitness: Math.floor(Math.random() * 51) + 50,   // 50-100
+      money: 500,
+      education: 'High School Diploma',
       job: 'Unemployed',
       salary: 0,
-      housing: 'Living with Parents',
-      careerLevel: 0,
-      monthlyExpenses: 0,
+      housing: 'Living with Parents', // Default housing
+      careerLevel: 0, // Default career level
       family: [
-        {
-          id: '1',
-          name: gender === 'male' ? 'John Martin' : 'Jane Martin',
-          relationship: 'father',
-          age: Math.floor(Math.random() * 20) + 25,
-          alive: true,
-          relationshipLevel: Math.floor(Math.random() * 50) + 50
-        },
-        {
-          id: '2',
-          name: gender === 'male' ? 'Mary Martin' : 'Maria Martin',
-          relationship: 'mother',
-          age: Math.floor(Math.random() * 20) + 25,
-          alive: true,
-          relationshipLevel: Math.floor(Math.random() * 50) + 50
-        }
+        { id: 'f1', name: `John ${name.split(' ').pop()}`, relationship: 'father', age: 45, alive: true, relationshipLevel: 70 },
+        { id: 'm1', name: `Jane ${name.split(' ').pop()}`, relationship: 'mother', age: 43, alive: true, relationshipLevel: 75 },
       ],
       relationships: [],
       lifeEvents: [{
-        id: '1',
-        year: birthYear,
-        age: 0,
-        event: `${name} was born!`,
-        type: 'positive'
+        id: Math.random().toString(36).substr(2,9),
+        year: birthYear + 18,
+        age: 18,
+        event: 'Started life!',
+        type: 'neutral'
       }],
-      pendingEvents: [],
       achievements: [],
       criminalRecord: [],
-      assets: []
+      assets: [],
+      pendingEvents: [], // Initialize pendingEvents
+      // monthlyExpenses is calculated dynamically, so not set here
     };
-
-    onCharacterCreated(character);
+    onCharacterCreate(newCharacter);
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-slate-800 border-slate-700 shadow-xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-white">Create Your Life</CardTitle>
-          <p className="text-slate-300">Start your journey</p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Name</label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
-              className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
+        <h2 className="text-2xl text-center mb-4">Create Your Character</h2>
+        <Form {...form}>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your character's name" {...field} value={name} onChange={(e) => setName(e.target.value)} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Gender</label>
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                variant={gender === 'male' ? 'default' : 'outline'}
-                onClick={() => setGender('male')}
-                className={gender === 'male' 
-                  ? "bg-blue-500 hover:bg-blue-600 text-white" 
-                  : "bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-300"
-                }
-              >
-                Male
-              </Button>
-              <Button
-                variant={gender === 'female' ? 'default' : 'outline'}
-                onClick={() => setGender('female')}
-                className={gender === 'female' 
-                  ? "bg-pink-500 hover:bg-pink-600 text-white" 
-                  : "bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-300"
-                }
-              >
-                Female
-              </Button>
-            </div>
-          </div>
-
-          <Button
-            onClick={createCharacter}
-            disabled={!name.trim()}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-          >
-            Start Life
-          </Button>
-        </CardContent>
-      </Card>
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between space-y-0 rounded-md border p-4">
+                  <div>
+                    <FormLabel>Gender</FormLabel>
+                  </div>
+                  <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-2">
+                    <FormItem>
+                      <RadioGroupItem value="male" id="r1"  onClick={() => setGender('male')}/>
+                      <FormLabel htmlFor="r1">Male</FormLabel>
+                    </FormItem>
+                    <FormItem>
+                      <RadioGroupItem value="female" id="r2" onClick={() => setGender('female')}/>
+                      <FormLabel htmlFor="r2">Female</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full">Create Character</Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 };

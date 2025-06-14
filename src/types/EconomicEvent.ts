@@ -1,5 +1,3 @@
-
-```typescript
 import { Asset } from './Asset';
 
 export interface EconomicEvent {
@@ -66,4 +64,3 @@ export const ECONOMIC_EVENTS: EconomicEvent[] = [
     durationYears: 1,
   }
 ];
-```
