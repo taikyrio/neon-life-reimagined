@@ -14,16 +14,16 @@ export interface CareerAdvancement {
 }
 
 export const SKILL_DEFINITIONS = [
-  { id: 'programming', name: 'Programming', category: 'technical' as const },
-  { id: 'communication', name: 'Communication', category: 'social' as const },
-  { id: 'leadership', name: 'Leadership', category: 'business' as const },
-  { id: 'creativity', name: 'Creativity', category: 'creative' as const },
-  { id: 'athletics', name: 'Athletics', category: 'physical' as const },
-  { id: 'negotiation', name: 'Negotiation', category: 'business' as const },
-  { id: 'design', name: 'Design', category: 'creative' as const },
-  { id: 'analytics', name: 'Analytics', category: 'technical' as const },
-  { id: 'public_speaking', name: 'Public Speaking', category: 'social' as const },
-  { id: 'time_management', name: 'Time Management', category: 'business' as const }
+  { id: 'programming', name: 'Programming', category: 'technical' as const, minAge: 12 },
+  { id: 'communication', name: 'Communication', category: 'social' as const, minAge: 8 },
+  { id: 'leadership', name: 'Leadership', category: 'business' as const, minAge: 16 },
+  { id: 'creativity', name: 'Creativity', category: 'creative' as const, minAge: 5 },
+  { id: 'athletics', name: 'Athletics', category: 'physical' as const, minAge: 6 },
+  { id: 'negotiation', name: 'Negotiation', category: 'business' as const, minAge: 16 },
+  { id: 'design', name: 'Design', category: 'creative' as const, minAge: 8 },
+  { id: 'analytics', name: 'Analytics', category: 'technical' as const, minAge: 14 },
+  { id: 'public_speaking', name: 'Public Speaking', category: 'social' as const, minAge: 12 },
+  { id: 'time_management', name: 'Time Management', category: 'business' as const, minAge: 10 }
 ];
 
 export const getCareerSkillBonus = (skills: Skill[], careerType: string): number => {
