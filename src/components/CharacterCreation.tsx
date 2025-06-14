@@ -1,166 +1,182 @@
-
-import React, { useState } from 'react';
-// Removed: import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { Character } from '../types/Character';
+import { generateRandomPersonality } from '../types/SocialSystem';
 
 interface CharacterCreationProps {
   onCharacterCreate: (character: Character) => void;
 }
 
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  gender: z.enum(['male', 'female']),
-})
-
-const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacterCreate }) => {
+const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
   const [name, setName] = useState('');
-  const [gender, setGender] = useState<'male' | 'female'>('male');
-  // Removed: const router = useRouter();
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      gender: "male",
-    },
-  })
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-  }
+  const [gender, setGender] = useState('male');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const birthYear = new Date().getFullYear() - 18; // Assume starting age is 18
+    if (!name.trim()) return;
 
+    const stats = generateRandomStats();
+    const personalityTraits = generateRandomPersonality();
+    
     const newCharacter: Character = {
       id: Math.random().toString(36).substr(2, 9),
-      name: name,
-      age: 18,
-      gender: gender,
-      birthYear: birthYear,
-      health: Math.floor(Math.random() * 31) + 70, // 70-100
-      happiness: Math.floor(Math.random() * 31) + 70, // 70-100
-      smartness: Math.floor(Math.random() * 51) + 50, // 50-100
-      appearance: Math.floor(Math.random() * 51) + 50, // 50-100
-      fitness: Math.floor(Math.random() * 51) + 50,   // 50-100
-      money: 500,
-      education: 'High School Diploma',
-      job: 'Unemployed',
+      name: name.trim(),
+      age: 0,
+      gender: gender as 'male' | 'female',
+      birthYear: new Date().getFullYear(),
+      
+      // Core stats
+      health: stats.health,
+      happiness: stats.happiness,
+      smartness: stats.smartness,
+      appearance: stats.appearance,
+      fitness: stats.fitness,
+      
+      // Life status
+      money: Math.floor(Math.random() * 1000) + 500,
+      education: 'none',
+      job: 'unemployed',
       salary: 0,
-      housing: 'Living with Parents', 
+      housing: 'family_home',
+      
+      // Life progress
       careerLevel: 0,
-      family: [
-        { id: 'f1', name: `John ${name.split(' ').pop()}`, relationship: 'father', age: 45, alive: true, relationshipLevel: 70 },
-        { id: 'm1', name: `Jane ${name.split(' ').pop()}`, relationship: 'mother', age: 43, alive: true, relationshipLevel: 75 },
-      ],
+      
+      // Social System
+      socialStatus: {
+        reputation: 50,
+        socialClass: 'lower',
+        popularity: Math.floor(Math.random() * 30) + 20,
+        networkSize: Math.floor(Math.random() * 5) + 2,
+      },
+      datingProfile: {
+        isActive: false,
+        preferences: {
+          minAge: Math.max(16, 0),
+          maxAge: Math.min(100, 0 + 10),
+          personalityTraits: [],
+        },
+        attractiveness: 0,
+        relationshipGoals: 'casual',
+      },
+      marriageStatus: {
+        isMarried: false,
+        marriageHappiness: 0,
+        divorceRisk: 0,
+      },
+      personalityTraits,
+      
+      // Relationships
+      family: generateFamily(gender as 'male' | 'female'),
       relationships: [],
+      children: [],
+      
+      // Life events
       lifeEvents: [{
-        id: Math.random().toString(36).substr(2,9),
-        year: birthYear + 18,
-        age: 18,
-        event: 'Started life!',
-        type: 'neutral'
+        id: Math.random().toString(36).substr(2, 9),
+        year: new Date().getFullYear(),
+        age: 0,
+        event: `${name} was born!`,
+        type: 'positive'
       }],
+      pendingEvents: [],
+      
+      // Other
       achievements: [],
       criminalRecord: [],
-      assets: [],
-      pendingEvents: [],
+      assets: []
     };
+
     onCharacterCreate(newCharacter);
   };
 
+  const generateRandomStats = () => {
+    return {
+      health: Math.floor(Math.random() * 30) + 70, // 70-100
+      happiness: Math.floor(Math.random() * 30) + 70, // 70-100
+      smartness: Math.floor(Math.random() * 50) + 50, // 50-100
+      appearance: Math.floor(Math.random() * 50) + 50, // 50-100
+      fitness: Math.floor(Math.random() * 30) + 70, // 70-100
+    };
+  };
+
+  const generateFamily = (gender: 'male' | 'female') => {
+    const fatherName = gender === 'male' ? 'John Doe Sr.' : 'John Doe';
+    const motherName = gender === 'male' ? 'Jane Doe' : 'Jane Doe Sr.';
+    
+    return [
+      {
+        id: '1',
+        name: fatherName,
+        relationship: 'father',
+        age: Math.floor(Math.random() * 15) + 25, // 25-40
+        alive: true,
+        relationshipLevel: Math.floor(Math.random() * 30) + 70, // 70-100
+      },
+      {
+        id: '2',
+        name: motherName,
+        relationship: 'mother',
+        age: Math.floor(Math.random() * 15) + 25, // 25-40
+        alive: true,
+        relationshipLevel: Math.floor(Math.random() * 30) + 70, // 70-100
+      },
+    ];
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900">
-      <div className="bg-slate-800 shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md border border-slate-700">
-        <h2 className="text-2xl text-center mb-6 text-white">Create Your Character</h2>
-        <Form {...form}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900">
+      <Card className="w-full max-w-md bg-slate-800 border-slate-700 shadow-xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-white">Create Your Character</CardTitle>
+        </CardHeader>
+        <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-slate-300">Name</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Enter your character's name" 
-                      {...field} 
-                      value={name} 
-                      onChange={(e) => {
-                        field.onChange(e);
-                        setName(e.target.value);
-                      }} 
-                      className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                   <FormLabel className="text-slate-300">Gender</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setGender(value as 'male' | 'female');
-                      }}
-                      defaultValue={field.value}
-                      className="flex space-x-2"
-                    >
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="male" id="male" className="text-sky-400 border-slate-600"/>
-                        </FormControl>
-                        <FormLabel htmlFor="male" className="font-normal text-slate-300">
-                          Male
-                        </FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="female" id="female" className="text-pink-400 border-slate-600" />
-                        </FormControl>
-                        <FormLabel htmlFor="female" className="font-normal text-slate-300">
-                          Female
-                        </FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-white">Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter your character's name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="bg-slate-700 border-slate-600 text-white"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="text-white">Gender</Label>
+              <RadioGroup 
+                value={gender} 
+                onValueChange={setGender}
+                className="flex space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="male" id="male" />
+                  <Label htmlFor="male" className="text-white">Male</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="female" id="female" />
+                  <Label htmlFor="female" className="text-white">Female</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            
+            <Button 
+              type="submit" 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
               Start Life
             </Button>
           </form>
-        </Form>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
 export default CharacterCreation;
-

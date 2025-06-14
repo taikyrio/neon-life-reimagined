@@ -119,6 +119,72 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         }
       });
 
+      // Age children and update their relationships
+      newCharacter.children = newCharacter.children.map(child => {
+        const agedChild = { ...child, age: child.age + 1 };
+        
+        // Children develop over time
+        if (agedChild.age >= 18) {
+          // Child becomes independent, relationship might change
+          agedChild.relationshipWithParent = Math.max(30, agedChild.relationshipWithParent + (Math.random() * 10 - 5));
+        }
+        
+        return agedChild;
+      });
+      
+      // Update marriage happiness if married
+      if (newCharacter.marriageStatus.isMarried) {
+        const happinessChange = Math.random() * 10 - 5; // -5 to +5
+        newCharacter.marriageStatus.marriageHappiness = Math.max(0, Math.min(100, 
+          newCharacter.marriageStatus.marriageHappiness + happinessChange
+        ));
+        
+        // Check for divorce risk
+        if (newCharacter.marriageStatus.marriageHappiness < 30) {
+          newCharacter.marriageStatus.divorceRisk = Math.min(100, newCharacter.marriageStatus.divorceRisk + 10);
+        } else {
+          newCharacter.marriageStatus.divorceRisk = Math.max(0, newCharacter.marriageStatus.divorceRisk - 5);
+        }
+        
+        // Potential divorce
+        if (newCharacter.marriageStatus.divorceRisk > 70 && Math.random() < 0.1) {
+          const spouse = newCharacter.family.find(f => f.relationship === 'spouse');
+          newCharacter.marriageStatus.isMarried = false;
+          newCharacter.marriageStatus.spouseId = undefined;
+          newCharacter.marriageStatus.marriageHappiness = 0;
+          newCharacter.marriageStatus.divorceRisk = 0;
+          newCharacter.family = newCharacter.family.filter(f => f.relationship !== 'spouse');
+          
+          newCharacter.lifeEvents = [...newCharacter.lifeEvents, {
+            id: Math.random().toString(36).substr(2, 9),
+            year: newCharacter.birthYear + newCharacter.age,
+            age: newCharacter.age,
+            event: `Divorced from ${spouse?.name || 'spouse'}.`,
+            type: 'negative'
+          }];
+          
+          newCharacter.happiness = Math.max(0, newCharacter.happiness - 20);
+        }
+      }
+      
+      // Update social status
+      newCharacter.socialStatus.socialClass = calculateSocialClass(
+        newCharacter.money, 
+        newCharacter.salary, 
+        newCharacter.socialStatus.reputation
+      );
+      
+      // Social relationships can decay over time
+      newCharacter.relationships = newCharacter.relationships.map(rel => {
+        if (rel.isActive) {
+          const decayChance = Math.random();
+          if (decayChance < 0.1) { // 10% chance of relationship decay
+            return { ...rel, relationshipLevel: Math.max(0, rel.relationshipLevel - 5) };
+          }
+        }
+        return rel;
+      }).filter(rel => rel.relationshipLevel > 0); // Remove completely failed relationships
+      
       const statChanges = {
         health: Math.floor(Math.random() * 11) - 5,
         happiness: Math.floor(Math.random() * 11) - 5,

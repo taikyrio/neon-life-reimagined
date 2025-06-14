@@ -1,5 +1,6 @@
 
-import { Asset as ImportedAsset } from './Asset'; // Renamed import to avoid conflict during transition, will use ImportedAsset
+import { Asset as ImportedAsset } from './Asset';
+import { SocialStatus, DatingProfile, MarriageStatus, Child } from './SocialSystem';
 
 export interface Character {
   id: string;
@@ -18,18 +19,25 @@ export interface Character {
   // Life Status
   money: number;
   education: string;
-  job: string; // Job ID from CAREERS
-  salary: number; // Annual salary
-  housing: string; // Housing ID from HOUSING_OPTIONS
+  job: string;
+  salary: number;
+  housing: string;
   
   // Life Progress
-  currentEducation?: string; // Education ID from EDUCATION_LEVELS
+  currentEducation?: string;
   educationYearsLeft?: number;
-  careerLevel: number; // Index or level within a career path
+  careerLevel: number;
+  
+  // Social System
+  socialStatus: SocialStatus;
+  datingProfile: DatingProfile;
+  marriageStatus: MarriageStatus;
+  personalityTraits: string[];
   
   // Relationships
   family: FamilyMember[];
   relationships: Relationship[];
+  children: Child[];
   
   // Life Events
   lifeEvents: LifeEvent[];
@@ -42,7 +50,7 @@ export interface Character {
   criminalRecord: CrimeRecord[];
   
   // Assets
-  assets: ImportedAsset[]; // Character's owned assets, using the imported type
+  assets: ImportedAsset[];
 }
 
 export interface FamilyMember {
@@ -57,9 +65,12 @@ export interface FamilyMember {
 export interface Relationship {
   id: string;
   name: string;
-  type: 'friend' | 'romantic' | 'enemy';
+  type: 'friend' | 'romantic' | 'enemy' | 'acquaintance' | 'dating' | 'engaged';
   relationshipLevel: number;
   age: number;
+  personalityTraits: string[];
+  yearMet: number;
+  isActive: boolean;
 }
 
 export interface LifeEvent {
@@ -79,47 +90,32 @@ export interface CrimeRecord {
   punishment?: string;
 }
 
-// Removed the local Asset interface definition that was causing a conflict.
-// export interface Asset {
-//   id: string;
-//   name: string;
-//   type: 'vehicle' | 'property' | 'luxury';
-//   value: number;
-//   purchaseYear: number;
-//   monthlyIncome: number;
-//   monthlyMaintenance: number;
-// }
-
 export interface PendingEvent {
   id: string;
-  eventId: string; // Could be a MajorLifeEvent ID or a custom event ID
+  eventId: string;
   triggerAge: number;
-  // additionalData?: any; // For event-specific parameters
 }
 
-// Helper function to calculate total monthly expenses (can be moved to a utility file later)
+// Helper functions
 export const calculateTotalMonthlyExpenses = (character: Character, housingOptions: any[], assetList: ImportedAsset[]): number => {
   let totalExpenses = 0;
 
-  // Housing expenses
   const currentHousing = housingOptions.find(h => h.id === character.housing);
   if (currentHousing) {
     totalExpenses += currentHousing.monthlyExpenses;
   }
 
-  // Asset maintenance
   character.assets.forEach(asset => {
     totalExpenses += asset.monthlyMaintenance;
   });
   
-  // Add other base living expenses if any (e.g. food, utilities not covered by housing/assets)
-  // For now, we'll assume housing and asset maintenance cover a lot.
-  // Could add a base living cost: e.g., totalExpenses += 200 (for food, basic needs)
+  // Add child support costs
+  const childSupport = character.children.length * 500; // $500 per child per month
+  totalExpenses += childSupport;
 
   return totalExpenses;
 };
 
-// Helper function to calculate total monthly income from assets
 export const calculateTotalMonthlyAssetIncome = (character: Character): number => {
   let totalIncome = 0;
   character.assets.forEach(asset => {
@@ -128,3 +124,11 @@ export const calculateTotalMonthlyAssetIncome = (character: Character): number =
   return totalIncome;
 };
 
+export const calculateSocialClass = (money: number, salary: number, reputation: number): 'lower' | 'middle' | 'upper' => {
+  const totalWealth = money + (salary * 2); // Consider both current money and earning potential
+  const adjustedWealth = totalWealth + (reputation * 1000); // Reputation adds to perceived class
+  
+  if (adjustedWealth < 50000) return 'lower';
+  if (adjustedWealth < 200000) return 'middle';
+  return 'upper';
+};
