@@ -1,4 +1,3 @@
-
 export interface Character {
   id: string;
   name: string;
@@ -18,6 +17,13 @@ export interface Character {
   education: string;
   job: string;
   salary: number;
+  housing: string;
+  
+  // Life Progress
+  currentEducation?: string;
+  educationYearsLeft?: number;
+  careerLevel: number;
+  monthlyExpenses: number;
   
   // Relationships
   family: FamilyMember[];
@@ -25,6 +31,7 @@ export interface Character {
   
   // Life Events
   lifeEvents: LifeEvent[];
+  pendingEvents: PendingEvent[];
   
   // Achievements
   achievements: string[];
@@ -76,4 +83,10 @@ export interface Asset {
   type: 'vehicle' | 'property' | 'luxury';
   value: number;
   purchaseYear: number;
+}
+
+export interface PendingEvent {
+  id: string;
+  eventId: string;
+  triggerAge: number;
 }
