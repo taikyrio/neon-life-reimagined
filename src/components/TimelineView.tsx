@@ -74,13 +74,13 @@ const TimelineView = ({
             </p>
           </div>
           
-          {/* Stats Bars - Similar to second photo */}
-          <div className="space-y-3">
-            <StatBar label="Health" value={character.health} color="bg-green-500" />
-            <StatBar label="Happiness" value={character.happiness} color="bg-yellow-500" />
-            <StatBar label="Smartness" value={character.smartness} color="bg-blue-500" />
-            <StatBar label="Appearance" value={character.appearance} color="bg-pink-500" />
-            <StatBar label="Fitness" value={character.fitness} color="bg-red-500" />
+          {/* Stats Bars - Windows 11 Style */}
+          <div className="space-y-4">
+            <Win11StatBar label="Health" value={character.health} color="from-green-400 to-green-600" />
+            <Win11StatBar label="Happiness" value={character.happiness} color="from-yellow-400 to-yellow-600" />
+            <Win11StatBar label="Smartness" value={character.smartness} color="from-blue-400 to-blue-600" />
+            <Win11StatBar label="Appearance" value={character.appearance} color="from-pink-400 to-pink-600" />
+            <Win11StatBar label="Fitness" value={character.fitness} color="from-red-400 to-red-600" />
           </div>
         </div>
 
@@ -171,16 +171,23 @@ const TimelineView = ({
   );
 };
 
-const StatBar = ({ label, value, color }: { label: string; value: number; color: string }) => (
+const Win11StatBar = ({ label, value, color }: { label: string; value: number; color: string }) => (
   <div className="flex items-center gap-3">
     <div className="w-20 text-right">
       <span className="text-white text-sm font-medium">{label}:</span>
     </div>
-    <div className="flex-1 h-6 bg-white/10 rounded-full overflow-hidden">
-      <div
-        className={`h-full ${color} transition-all duration-300 rounded-full`}
-        style={{ width: `${Math.min(value, 100)}%` }}
-      />
+    <div className="flex-1 relative">
+      {/* Background track */}
+      <div className="h-3 bg-white/10 rounded-full shadow-inner backdrop-blur-sm border border-white/5">
+        {/* Progress fill */}
+        <div
+          className={`h-full bg-gradient-to-r ${color} rounded-full transition-all duration-500 ease-out shadow-sm relative overflow-hidden`}
+          style={{ width: `${Math.min(value, 100)}%` }}
+        >
+          {/* Subtle shine effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-pulse" />
+        </div>
+      </div>
     </div>
     <div className="w-12 text-left">
       <span className="text-white/80 text-sm font-medium">{value}%</span>
