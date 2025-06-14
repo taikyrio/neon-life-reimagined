@@ -7,6 +7,7 @@ import { HOUSING_OPTIONS } from '../types/Housing';
 import { generateRandomEvent, BitLifeEvent } from '../types/BitLifeEvents';
 import { checkAchievements } from '../types/Achievements';
 import { SKILL_DEFINITIONS } from '../types/Skills';
+import { CRIMES } from '../types/Crime';
 import { useToast } from '@/hooks/use-toast';
 
 interface UseGameLogicProps {
@@ -339,6 +340,57 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
       let eventMessage = '';
 
       switch (actionType) {
+        case 'commit_crime':
+          const crime = CRIMES.find(c => c.id === payload.crimeId);
+          if (crime) {
+            // Initialize reputation if not exists
+            if (!newCharacter.reputation) {
+              newCharacter.reputation = { legal: 50, criminal: 0 };
+            }
+            
+            // Add to criminal record
+            const crimeRecord = {
+              id: Math.random().toString(36).substr(2, 9),
+              crime: crime.name,
+              year: newCharacter.birthYear + newCharacter.age,
+              age: newCharacter.age,
+              caught: payload.arrested,
+              punishment: payload.consequences?.duration ? 
+                `${payload.consequences.duration} months jail, $${payload.consequences.fine?.toLocaleString()} fine` : 
+                undefined,
+              severity: crime.category === 'petty' ? 'misdemeanor' as const : 'felony' as const
+            };
+            
+            newCharacter.criminalRecord = [...newCharacter.criminalRecord, crimeRecord];
+            
+            // Update money and reputation
+            if (payload.success) {
+              newCharacter.money += payload.payout;
+              newCharacter.reputation.criminal += 5;
+              newCharacter.criminalExperience = (newCharacter.criminalExperience || 0) + 1;
+            }
+            
+            if (payload.arrested) {
+              newCharacter.reputation.legal -= 10;
+              newCharacter.happiness = Math.max(0, newCharacter.happiness - 15);
+              
+              if (payload.consequences?.fine) {
+                newCharacter.money = Math.max(0, newCharacter.money - payload.consequences.fine);
+              }
+              
+              // Add legal consequences
+              if (payload.consequences) {
+                if (!newCharacter.legalConsequences) newCharacter.legalConsequences = [];
+                newCharacter.legalConsequences.push(payload.consequences);
+              }
+            }
+            
+            eventMessage = payload.success ? 
+              `Successfully committed ${crime.name}${payload.arrested ? ' but got caught' : ''}` :
+              `Failed to commit ${crime.name}${payload.arrested ? ' and got arrested' : ''}`;
+          }
+          break;
+        
         case 'start_education':
           newCharacter.money -= payload.cost;
           newCharacter.currentEducation = payload.educationId;
@@ -441,7 +493,8 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
           year: newCharacter.birthYear + newCharacter.age,
           age: newCharacter.age,
           event: eventMessage,
-          type: 'neutral'
+          type: actionType === 'commit_crime' ? 
+            (payload.success && !payload.arrested ? 'positive' : 'negative') : 'neutral'
         }];
       }
       return newCharacter;

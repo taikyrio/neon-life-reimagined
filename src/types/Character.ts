@@ -2,6 +2,7 @@
 import { Asset as ImportedAsset } from './Asset';
 import { SocialStatus, DatingProfile, MarriageStatus, Child } from './SocialSystem';
 import { Skill } from './Skills';
+import { LegalConsequence } from './Crime';
 
 export interface Character {
   id: string;
@@ -32,6 +33,15 @@ export interface Character {
   // New Career System
   skills?: Skill[];
   experiencePoints?: number;
+  
+  // Crime System
+  criminalExperience?: number;
+  reputation?: {
+    legal: number;
+    criminal: number;
+  };
+  legalConsequences?: LegalConsequence[];
+  criminalOrganization?: string;
   
   // Social System
   socialStatus: SocialStatus;
@@ -93,6 +103,7 @@ export interface CrimeRecord {
   age: number;
   caught: boolean;
   punishment?: string;
+  severity?: 'misdemeanor' | 'felony';
 }
 
 export interface PendingEvent {

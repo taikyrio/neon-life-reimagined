@@ -1,9 +1,9 @@
 
-import { Heart, User, Briefcase, Calendar, PiggyBank, Trophy, TrendingUp } from 'lucide-react';
+import { Heart, User, Briefcase, Calendar, PiggyBank, Trophy, TrendingUp, AlertTriangle } from 'lucide-react';
 
 interface BottomNavigationProps {
-  activeTab: 'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career';
-  setActiveTab: (tab: 'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career') => void;
+  activeTab: 'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career' | 'crime';
+  setActiveTab: (tab: 'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career' | 'crime') => void;
 }
 
 const BottomNavigation = ({ activeTab, setActiveTab }: BottomNavigationProps) => {
@@ -11,6 +11,7 @@ const BottomNavigation = ({ activeTab, setActiveTab }: BottomNavigationProps) =>
     { id: 'timeline', icon: Calendar, label: 'Timeline' },
     { id: 'activities', icon: Briefcase, label: 'Actions' },
     { id: 'career', icon: TrendingUp, label: 'Career' },
+    { id: 'crime', icon: AlertTriangle, label: 'Crime' },
     { id: 'relationships', icon: Heart, label: 'Relations' },
     { id: 'achievements', icon: Trophy, label: 'Achievements' },
     { id: 'assets', icon: PiggyBank, label: 'Assets' },

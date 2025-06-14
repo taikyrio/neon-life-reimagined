@@ -14,6 +14,7 @@ import LifeStageActions from './LifeStageActions';
 import EnhancedRelationships from './EnhancedRelationships';
 import AchievementsPanel from './AchievementsPanel';
 import CareerDevelopment from './CareerDevelopment';
+import CrimeActivities from './CrimeActivities';
 
 interface GameInterfaceProps {
   character: Character;
@@ -21,7 +22,7 @@ interface GameInterfaceProps {
 }
 
 const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
-  const [activeTab, setActiveTab] = useState<'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career' | 'crime'>('timeline');
   
   const {
     currentMajorEvent,
@@ -56,6 +57,8 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         return <AchievementsPanel character={character} />;
       case 'career':
         return <CareerDevelopment character={character} onAction={handleLifeStageAction} />;
+      case 'crime':
+        return <CrimeActivities character={character} onAction={handleLifeStageAction} />;
       default:
         return <TimelineView character={character} onAgeUp={ageUp} onLifeStageAction={handleLifeStageAction} monthlyExpenses={totalMonthlyExpenses} monthlyAssetIncome={totalMonthlyAssetIncome} />;
     }
