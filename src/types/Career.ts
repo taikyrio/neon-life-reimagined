@@ -1,4 +1,3 @@
-
 export interface Career {
   id: string;
   name: string;
@@ -32,13 +31,31 @@ export const EDUCATION_LEVELS: Education[] = [
     description: 'No formal education'
   },
   {
+    id: 'elementary',
+    name: 'Elementary School',
+    duration: 0,
+    cost: 0,
+    minAge: 5,
+    statBoosts: { smartness: 5 },
+    description: 'Basic elementary education'
+  },
+  {
+    id: 'middle_school',
+    name: 'Middle School',
+    duration: 0,
+    cost: 0,
+    minAge: 11,
+    statBoosts: { smartness: 5 },
+    description: 'Middle school education'
+  },
+  {
     id: 'high_school',
     name: 'High School',
     duration: 4,
     cost: 0,
     minAge: 14,
     statBoosts: { smartness: 10 },
-    description: 'Basic education'
+    description: 'High school education'
   },
   {
     id: 'college',

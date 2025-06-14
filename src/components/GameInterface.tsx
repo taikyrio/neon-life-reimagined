@@ -51,6 +51,90 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
       let newCharacter = { ...prevCharacter };
       newCharacter.age += 1;
       
+      // Handle automatic school enrollments
+      if (newCharacter.age === 5) {
+        newCharacter.education = 'elementary';
+        newCharacter.lifeEvents = [...newCharacter.lifeEvents, {
+          id: Math.random().toString(36).substr(2, 9),
+          year: newCharacter.birthYear + newCharacter.age,
+          age: newCharacter.age,
+          event: 'Started elementary school!',
+          type: 'positive'
+        }];
+        newCharacter.smartness = Math.min(100, newCharacter.smartness + 5);
+      }
+      
+      if (newCharacter.age === 11) {
+        newCharacter.education = 'middle_school';
+        newCharacter.lifeEvents = [...newCharacter.lifeEvents, {
+          id: Math.random().toString(36).substr(2, 9),
+          year: newCharacter.birthYear + newCharacter.age,
+          age: newCharacter.age,
+          event: 'Started middle school!',
+          type: 'positive'
+        }];
+        newCharacter.smartness = Math.min(100, newCharacter.smartness + 5);
+      }
+      
+      if (newCharacter.age === 14) {
+        newCharacter.education = 'high_school';
+        newCharacter.lifeEvents = [...newCharacter.lifeEvents, {
+          id: Math.random().toString(36).substr(2, 9),
+          year: newCharacter.birthYear + newCharacter.age,
+          age: newCharacter.age,
+          event: 'Started high school!',
+          type: 'positive'
+        }];
+        newCharacter.smartness = Math.min(100, newCharacter.smartness + 5);
+      }
+      
+      if (newCharacter.age === 18) {
+        newCharacter.education = 'high_school';
+        newCharacter.lifeEvents = [...newCharacter.lifeEvents, {
+          id: Math.random().toString(36).substr(2, 9),
+          year: newCharacter.birthYear + newCharacter.age,
+          age: newCharacter.age,
+          event: 'Graduated from high school! Time to choose your path in life.',
+          type: 'positive'
+        }];
+        newCharacter.smartness = Math.min(100, newCharacter.smartness + 10);
+        
+        // Create a special major event for choosing life path at 18
+        const lifePathEvent: MajorLifeEvent = {
+          id: 'life_path_choice',
+          name: 'Choose Your Path',
+          description: 'You\'ve graduated high school! What do you want to do with your life?',
+          minAge: 18,
+          maxAge: 18,
+          probability: 1.0,
+          choices: [
+            {
+              id: 'college',
+              text: 'Go to college',
+              effects: { money: -50000, smartness: 25, happiness: 10 }
+            },
+            {
+              id: 'work',
+              text: 'Start working immediately',
+              effects: { money: 20000, smartness: -5 }
+            },
+            {
+              id: 'gap_year',
+              text: 'Take a gap year to figure things out',
+              effects: { happiness: 15, smartness: 5 }
+            },
+            {
+              id: 'military',
+              text: 'Join the military',
+              effects: { fitness: 20, health: 10, smartness: 5, money: 15000 }
+            }
+          ]
+        };
+        
+        setCurrentMajorEvent(lifePathEvent);
+        setShowEventDialog(true);
+      }
+      
       const currentTotalMonthlyExpenses = calculateTotalMonthlyExpenses(newCharacter, HOUSING_OPTIONS, newCharacter.assets);
       const currentTotalMonthlyAssetIncome = calculateTotalMonthlyAssetIncome(newCharacter);
 
@@ -59,6 +143,7 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
       newCharacter.money += netMonthlyChange;
       newCharacter.money = Math.max(0, newCharacter.money);
 
+      // ... keep existing code (education completion logic)
       if (newCharacter.currentEducation && newCharacter.educationYearsLeft) {
         newCharacter.educationYearsLeft -= 1;
         if (newCharacter.educationYearsLeft <= 0) {
@@ -77,6 +162,7 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         }
       }
       
+      // ... keep existing code (asset value updates, economic events, children aging, marriage logic, social status updates, relationship decay, stat changes, major events, random life events, family aging, BitLife events)
       newCharacter.assets = newCharacter.assets.map(asset => {
         const assetInfo = ASSET_OPTIONS.find(opt => opt.id === asset.id);
         if (!assetInfo) return asset;
@@ -126,34 +212,28 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         }
       });
 
-      // Age children and update their relationships
       newCharacter.children = newCharacter.children.map(child => {
         const agedChild = { ...child, age: child.age + 1 };
         
-        // Children develop over time
         if (agedChild.age >= 18) {
-          // Child becomes independent, relationship might change
           agedChild.relationshipWithParent = Math.max(30, agedChild.relationshipWithParent + (Math.random() * 10 - 5));
         }
         
         return agedChild;
       });
       
-      // Update marriage happiness if married
       if (newCharacter.marriageStatus.isMarried) {
-        const happinessChange = Math.random() * 10 - 5; // -5 to +5
+        const happinessChange = Math.random() * 10 - 5;
         newCharacter.marriageStatus.marriageHappiness = Math.max(0, Math.min(100, 
           newCharacter.marriageStatus.marriageHappiness + happinessChange
         ));
         
-        // Check for divorce risk
         if (newCharacter.marriageStatus.marriageHappiness < 30) {
           newCharacter.marriageStatus.divorceRisk = Math.min(100, newCharacter.marriageStatus.divorceRisk + 10);
         } else {
           newCharacter.marriageStatus.divorceRisk = Math.max(0, newCharacter.marriageStatus.divorceRisk - 5);
         }
         
-        // Potential divorce
         if (newCharacter.marriageStatus.divorceRisk > 70 && Math.random() < 0.1) {
           const spouse = newCharacter.family.find(f => f.relationship === 'spouse');
           newCharacter.marriageStatus.isMarried = false;
@@ -174,23 +254,21 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         }
       }
       
-      // Update social status
       newCharacter.socialStatus.socialClass = calculateSocialClass(
         newCharacter.money, 
         newCharacter.salary, 
         newCharacter.socialStatus.reputation
       );
       
-      // Social relationships can decay over time
       newCharacter.relationships = newCharacter.relationships.map(rel => {
         if (rel.isActive) {
           const decayChance = Math.random();
-          if (decayChance < 0.1) { // 10% chance of relationship decay
+          if (decayChance < 0.1) {
             return { ...rel, relationshipLevel: Math.max(0, rel.relationshipLevel - 5) };
           }
         }
         return rel;
-      }).filter(rel => rel.relationshipLevel > 0); // Remove completely failed relationships
+      }).filter(rel => rel.relationshipLevel > 0);
       
       const statChanges = {
         health: Math.floor(Math.random() * 11) - 5,
@@ -206,16 +284,19 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
       newCharacter.appearance = Math.max(0, Math.min(100, newCharacter.appearance + statChanges.appearance));
       newCharacter.fitness = Math.max(0, Math.min(100, newCharacter.fitness + statChanges.fitness));
       
-      const possibleEvents = MAJOR_LIFE_EVENTS.filter(event => 
-        newCharacter.age >= event.minAge && 
-        newCharacter.age <= event.maxAge &&
-        Math.random() < event.probability
-      );
-      
-      if (possibleEvents.length > 0 && !currentMajorEvent && !showEventDialog) {
-        const selectedEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
-        setCurrentMajorEvent(selectedEvent);
-        setShowEventDialog(true);
+      // Only check for other major events if we haven't triggered the life path choice at 18
+      if (newCharacter.age !== 18) {
+        const possibleEvents = MAJOR_LIFE_EVENTS.filter(event => 
+          newCharacter.age >= event.minAge && 
+          newCharacter.age <= event.maxAge &&
+          Math.random() < event.probability
+        );
+        
+        if (possibleEvents.length > 0 && !currentMajorEvent && !showEventDialog) {
+          const selectedEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
+          setCurrentMajorEvent(selectedEvent);
+          setShowEventDialog(true);
+        }
       }
       
       const randomLifeEventsPool = [ 
@@ -241,8 +322,7 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         age: member.age + 1,
       }));
       
-      // Check for BitLife-style random events
-      if (!showBitLifeEvent && Math.random() < 0.3) { // 30% chance per age up
+      if (!showBitLifeEvent && Math.random() < 0.3) {
         const randomEvent = generateRandomEvent(newCharacter.age);
         if (randomEvent) {
           setCurrentBitLifeEvent(randomEvent);
@@ -370,7 +450,6 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
     setCharacter(prevCharacter => {
       let newCharacter = { ...prevCharacter };
       
-      // Apply choice effects
       Object.entries(choice.effects).forEach(([key, value]) => {
         if (typeof value === 'number' && typeof (newCharacter as any)[key] === 'number') {
           (newCharacter as any)[key] = Math.max(0, (newCharacter as any)[key] + value);
@@ -380,7 +459,6 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         }
       });
 
-      // Add to life events
       newCharacter.lifeEvents = [...newCharacter.lifeEvents, {
         id: Math.random().toString(36).substr(2, 9),
         year: newCharacter.birthYear + newCharacter.age,
@@ -426,7 +504,6 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
     <div className="min-h-screen text-white flex flex-col relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Toaster />
       
-      {/* Mobile-First Stats Header */}
       <div className="glass-card m-2 p-3 shadow-lg sticky top-2 z-10 border border-white/20">
         <div className="text-center">
           <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -443,12 +520,10 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         </div>
       </div>
 
-      {/* Content Area - Mobile Optimized */}
       <div className="flex-grow overflow-y-auto pb-20">
         {renderContent()}
       </div>
 
-      {/* Bottom Navigation - Mobile First */}
       <div className="fixed bottom-0 left-0 right-0 mica-card border-t border-white/10 px-2 py-2 shadow-2xl safe-area-bottom">
         <div className="flex justify-around items-center">
           {menuItems.map((item) => (
@@ -469,7 +544,6 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         </div>
       </div>
 
-      {/* BitLife-style Event Overlay */}
       <BitLifeEventOverlay
         event={currentBitLifeEvent}
         isOpen={showBitLifeEvent}
@@ -480,7 +554,6 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         }}
       />
 
-      {/* Keep existing MajorEventDialog */}
       <MajorEventDialog
         isOpen={showEventDialog}
         event={currentMajorEvent}
