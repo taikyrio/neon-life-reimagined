@@ -25,6 +25,42 @@ const TimelineView = ({
   const yearlySalary = character.salary || 0;
   const netMonthlyCashflow = Math.floor(yearlySalary / 12) + monthlyAssetIncome - monthlyExpenses;
 
+  // Create a timeline entry for every age from 0 to current age
+  const createFullTimeline = () => {
+    const timeline = [];
+    for (let age = 0; age <= character.age; age++) {
+      const year = character.birthYear + age;
+      const eventsAtAge = character.lifeEvents.filter(event => event.age === age);
+      
+      if (eventsAtAge.length > 0) {
+        // Add each event for this age
+        eventsAtAge.forEach(event => {
+          timeline.push({
+            id: event.id,
+            age,
+            year,
+            event: event.event,
+            type: event.type,
+            hasEvent: true
+          });
+        });
+      } else {
+        // Add a basic age entry if no events
+        timeline.push({
+          id: `age-${age}`,
+          age,
+          year,
+          event: `Turned ${age} years old`,
+          type: 'neutral' as const,
+          hasEvent: false
+        });
+      }
+    }
+    return timeline.reverse(); // Show newest first
+  };
+
+  const fullTimeline = createFullTimeline();
+
   return (
     <div className="flex flex-col h-full relative">
       {/* Scrollable Content */}
@@ -86,36 +122,37 @@ const TimelineView = ({
 
         {/* Timeline - Scrollable Box */}
         <div className="mica-card p-4 border border-white/10">
-          <h3 className="text-white font-semibold text-lg mb-3">Timeline</h3>
+          <h3 className="text-white font-semibold text-lg mb-3">Complete Timeline</h3>
           <ScrollArea className="h-64 w-full rounded-md">
             <div className="space-y-3 pr-4">
-              {character.lifeEvents.length === 0 && (
-                <p className="text-white/60 text-sm text-center py-8">No major events yet.</p>
+              {fullTimeline.length === 0 && (
+                <p className="text-white/60 text-sm text-center py-8">No timeline entries yet.</p>
               )}
-              {character.lifeEvents
-                .slice()
-                .reverse()
-                .map((event, index) => (
-                  <div key={event.id} className="flex items-start gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className={`w-3 h-3 rounded-full ${
-                        event.type === 'positive' ? 'bg-green-400' : 
-                        event.type === 'negative' ? 'bg-red-400' : 'bg-white/60'
-                      }`} />
-                      {index < character.lifeEvents.length - 1 && (
-                        <div className="w-0.5 h-8 bg-white/20 mt-1" />
-                      )}
-                    </div>
-                    <div className="flex-1 pb-4">
-                      <div className="glass-card p-3 border border-white/10">
-                        <p className="text-white text-sm font-medium">{event.event}</p>
-                        <p className="text-white/60 text-xs mt-1">
-                          {event.year} - Age {event.age}
-                        </p>
-                      </div>
+              {fullTimeline.map((entry, index) => (
+                <div key={entry.id} className="flex items-start gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-3 h-3 rounded-full ${
+                      entry.hasEvent ? (
+                        entry.type === 'positive' ? 'bg-green-400' : 
+                        entry.type === 'negative' ? 'bg-red-400' : 'bg-white/60'
+                      ) : 'bg-white/30'
+                    }`} />
+                    {index < fullTimeline.length - 1 && (
+                      <div className="w-0.5 h-8 bg-white/20 mt-1" />
+                    )}
+                  </div>
+                  <div className="flex-1 pb-4">
+                    <div className={`${entry.hasEvent ? 'glass-card' : 'bg-white/5'} p-3 border border-white/10 rounded`}>
+                      <p className={`text-sm font-medium ${entry.hasEvent ? 'text-white' : 'text-white/70'}`}>
+                        {entry.event}
+                      </p>
+                      <p className="text-white/60 text-xs mt-1">
+                        {entry.year} - Age {entry.age}
+                      </p>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           </ScrollArea>
         </div>
