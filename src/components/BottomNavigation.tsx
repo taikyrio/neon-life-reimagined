@@ -1,17 +1,19 @@
 
-import { Heart, User, Briefcase, Calendar, PiggyBank } from 'lucide-react';
+import { Heart, User, Briefcase, Calendar, PiggyBank, Trophy, TrendingUp } from 'lucide-react';
 
 interface BottomNavigationProps {
-  activeTab: 'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'settings';
-  setActiveTab: (tab: 'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'settings') => void;
+  activeTab: 'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career';
+  setActiveTab: (tab: 'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career') => void;
 }
 
 const BottomNavigation = ({ activeTab, setActiveTab }: BottomNavigationProps) => {
   const menuItems = [
     { id: 'timeline', icon: Calendar, label: 'Timeline' },
     { id: 'activities', icon: Briefcase, label: 'Actions' },
-    { id: 'assets', icon: PiggyBank, label: 'Assets' },
+    { id: 'career', icon: TrendingUp, label: 'Career' },
     { id: 'relationships', icon: Heart, label: 'Relations' },
+    { id: 'achievements', icon: Trophy, label: 'Achievements' },
+    { id: 'assets', icon: PiggyBank, label: 'Assets' },
     { id: 'profile', icon: User, label: 'Profile' },
   ];
 

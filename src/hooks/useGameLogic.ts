@@ -5,6 +5,8 @@ import { ASSET_OPTIONS, Asset } from '../types/Asset';
 import { ECONOMIC_EVENTS } from '../types/EconomicEvent';
 import { HOUSING_OPTIONS } from '../types/Housing';
 import { generateRandomEvent, BitLifeEvent } from '../types/BitLifeEvents';
+import { checkAchievements } from '../types/Achievements';
+import { SKILL_DEFINITIONS } from '../types/Skills';
 import { useToast } from '@/hooks/use-toast';
 
 interface UseGameLogicProps {
@@ -305,6 +307,28 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
         }
       }
       
+      // Check for new achievements
+      const newAchievements = checkAchievements(newCharacter);
+      if (newAchievements.length > 0) {
+        newAchievements.forEach(achievement => {
+          if (!newCharacter.achievements) newCharacter.achievements = [];
+          newCharacter.achievements.push(achievement.id);
+          
+          newCharacter.lifeEvents.push({
+            id: Math.random().toString(36).substr(2, 9),
+            year: newCharacter.birthYear + newCharacter.age,
+            age: newCharacter.age,
+            event: `🏆 Achievement Unlocked: ${achievement.name}`,
+            type: 'positive'
+          });
+        });
+      }
+      
+      // Gain work experience if employed
+      if (newCharacter.job !== 'unemployed') {
+        newCharacter.experiencePoints = (newCharacter.experiencePoints || 0) + 10;
+      }
+      
       return newCharacter;
     });
   };
@@ -367,6 +391,37 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
             newCharacter.assets = newCharacter.assets.filter(a => a.id !== payload.assetId);
             eventMessage = `Sold ${assetToSell.name} for $${payload.sellPrice.toLocaleString()}.`;
           }
+          break;
+        case 'train_skill':
+          newCharacter.money -= payload.cost;
+          if (!newCharacter.skills) newCharacter.skills = [];
+          
+          const existingSkill = newCharacter.skills.find(s => s.id === payload.skillId);
+          if (existingSkill) {
+            existingSkill.level = Math.min(100, existingSkill.level + 15);
+          } else {
+            const skillDef = SKILL_DEFINITIONS.find(s => s.id === payload.skillId);
+            if (skillDef) {
+              newCharacter.skills.push({
+                id: payload.skillId,
+                name: skillDef.name,
+                level: 15,
+                category: skillDef.category
+              });
+            }
+          }
+          
+          newCharacter.experiencePoints = (newCharacter.experiencePoints || 0) + payload.experienceGain;
+          eventMessage = `Improved ${SKILL_DEFINITIONS.find(s => s.id === payload.skillId)?.name} skill through training.`;
+          break;
+        case 'promotion':
+          newCharacter.careerLevel += 1;
+          newCharacter.salary += payload.salaryIncrease;
+          if (payload.experienceReset) {
+            newCharacter.experiencePoints = 0;
+          }
+          newCharacter.happiness = Math.min(100, newCharacter.happiness + 20);
+          eventMessage = `Got promoted! New career level: ${newCharacter.careerLevel}`;
           break;
         default:
           Object.entries(payload).forEach(([key, value]) => {

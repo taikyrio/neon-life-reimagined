@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Character } from '../types/Character';
 import { Toaster } from "@/components/ui/toaster";
@@ -10,7 +11,9 @@ import AssetsPanel from './AssetsPanel';
 import ProfileView from './ProfileView';
 import SocialActivitiesPanel from './SocialActivitiesPanel';
 import LifeStageActions from './LifeStageActions';
-import RelationshipsPanel from './RelationshipsPanel';
+import EnhancedRelationships from './EnhancedRelationships';
+import AchievementsPanel from './AchievementsPanel';
+import CareerDevelopment from './CareerDevelopment';
 
 interface GameInterfaceProps {
   character: Character;
@@ -18,7 +21,7 @@ interface GameInterfaceProps {
 }
 
 const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
-  const [activeTab, setActiveTab] = useState<'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'settings'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career'>('timeline');
   
   const {
     currentMajorEvent,
@@ -46,9 +49,13 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
       case 'assets':
         return <AssetsPanel character={character} onAction={handleLifeStageAction} />;
       case 'relationships':
-        return <RelationshipsPanel character={character} setCharacter={setCharacter} />;
+        return <EnhancedRelationships character={character} setCharacter={setCharacter} />;
       case 'profile':
         return <ProfileView character={character} />;
+      case 'achievements':
+        return <AchievementsPanel character={character} />;
+      case 'career':
+        return <CareerDevelopment character={character} onAction={handleLifeStageAction} />;
       default:
         return <TimelineView character={character} onAgeUp={ageUp} onLifeStageAction={handleLifeStageAction} monthlyExpenses={totalMonthlyExpenses} monthlyAssetIncome={totalMonthlyAssetIncome} />;
     }

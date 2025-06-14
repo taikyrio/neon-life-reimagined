@@ -1,6 +1,7 @@
 
 import { Asset as ImportedAsset } from './Asset';
 import { SocialStatus, DatingProfile, MarriageStatus, Child } from './SocialSystem';
+import { Skill } from './Skills';
 
 export interface Character {
   id: string;
@@ -27,6 +28,10 @@ export interface Character {
   currentEducation?: string;
   educationYearsLeft?: number;
   careerLevel: number;
+  
+  // New Career System
+  skills?: Skill[];
+  experiencePoints?: number;
   
   // Social System
   socialStatus: SocialStatus;
