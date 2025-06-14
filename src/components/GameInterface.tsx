@@ -19,6 +19,8 @@ import TimelineView from './TimelineView';
 import AssetsPanel from './AssetsPanel';
 import ProfileView from './ProfileView';
 import SocialActivitiesPanel from './SocialActivitiesPanel';
+import BitLifeEventOverlay from './BitLifeEventOverlay';
+import { BITLIFE_EVENTS, generateRandomEvent, BitLifeEvent } from '../types/BitLifeEvents';
 
 interface GameInterfaceProps {
   character: Character;
@@ -29,6 +31,11 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
   const [activeTab, setActiveTab] = useState<'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'settings'>('timeline');
   const [currentMajorEvent, setCurrentMajorEvent] = useState<MajorLifeEvent | null>(null);
   const [showEventDialog, setShowEventDialog] = useState(false);
+  
+  // BitLife-style events
+  const [currentBitLifeEvent, setCurrentBitLifeEvent] = useState<BitLifeEvent | null>(null);
+  const [showBitLifeEvent, setShowBitLifeEvent] = useState(false);
+  
   const { toast } = useToast();
 
   const [totalMonthlyExpenses, setTotalMonthlyExpenses] = useState(0);
@@ -234,6 +241,15 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         age: member.age + 1,
       }));
       
+      // Check for BitLife-style random events
+      if (!showBitLifeEvent && Math.random() < 0.3) { // 30% chance per age up
+        const randomEvent = generateRandomEvent(newCharacter.age);
+        if (randomEvent) {
+          setCurrentBitLifeEvent(randomEvent);
+          setShowBitLifeEvent(true);
+        }
+      }
+      
       return newCharacter;
     });
   };
@@ -350,6 +366,37 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
     setCurrentMajorEvent(null);
   };
 
+  const handleBitLifeEventChoice = (choice: any) => {
+    setCharacter(prevCharacter => {
+      let newCharacter = { ...prevCharacter };
+      
+      // Apply choice effects
+      Object.entries(choice.effects).forEach(([key, value]) => {
+        if (typeof value === 'number' && typeof (newCharacter as any)[key] === 'number') {
+          (newCharacter as any)[key] = Math.max(0, (newCharacter as any)[key] + value);
+          if (key !== 'money') {
+            (newCharacter as any)[key] = Math.min(100, (newCharacter as any)[key]);
+          }
+        }
+      });
+
+      // Add to life events
+      newCharacter.lifeEvents = [...newCharacter.lifeEvents, {
+        id: Math.random().toString(36).substr(2, 9),
+        year: newCharacter.birthYear + newCharacter.age,
+        age: newCharacter.age,
+        event: `${currentBitLifeEvent?.title}: ${choice.text}`,
+        type: choice.effects.happiness && choice.effects.happiness > 0 ? 'positive' : 
+              choice.effects.happiness && choice.effects.happiness < 0 ? 'negative' : 'neutral'
+      }];
+
+      return newCharacter;
+    });
+    
+    setShowBitLifeEvent(false);
+    setCurrentBitLifeEvent(null);
+  };
+
   const menuItems = [
     { id: 'timeline', icon: Calendar, label: 'Timeline' },
     { id: 'activities', icon: Briefcase, label: 'Actions' },
@@ -376,58 +423,73 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col relative overflow-hidden">
       <Toaster />
-      {/* Stats Header - Always Visible */}
-      <div className="bg-slate-800/90 backdrop-blur-sm p-3 border-b border-slate-600 shadow-lg sticky top-0 z-10">
-        <div className="text-center mb-2">
-          <h1 className="text-lg font-bold">{character.name}</h1>
-          <p className="text-slate-300 text-xs">
+      
+      {/* Stats Header - iOS 26 Style */}
+      <div className="glass-card m-2 p-3 shadow-lg sticky top-2 z-10 border border-white/20">
+        <div className="text-center mb-3">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            {character.name}
+          </h1>
+          <p className="text-white/70 text-sm">
             Age {character.age} • ${character.money.toLocaleString()} • {getCurrentLifeStage(character.age).name}
           </p>
           {character.currentEducation && (
-            <p className="text-blue-400 text-xs italic">
-              Studying {character.currentEducation} ({character.educationYearsLeft} yrs left)
+            <p className="text-blue-400 text-xs italic mt-1">
+              📚 Studying {character.currentEducation} ({character.educationYearsLeft} yrs left)
             </p>
           )}
         </div>
         
-        <div className="grid grid-cols-3 gap-x-2 gap-y-1 text-xs">
-          <StatBar label="Health" value={character.health} color="bg-gradient-to-r from-green-500 to-emerald-500" />
-          <StatBar label="Happiness" value={character.happiness} color="bg-gradient-to-r from-yellow-500 to-orange-500" />
-          <StatBar label="Smarts" value={character.smartness} color="bg-gradient-to-r from-blue-500 to-cyan-500" />
-          <StatBar label="Looks" value={character.appearance} color="bg-gradient-to-r from-pink-500 to-rose-500" />
-          <StatBar label="Fitness" value={character.fitness} color="bg-gradient-to-r from-red-500 to-pink-500" />
+        <div className="grid grid-cols-3 gap-x-3 gap-y-2 text-xs">
+          <StatBar label="Health" value={character.health} gradient="from-green-400 to-emerald-400" />
+          <StatBar label="Happiness" value={character.happiness} gradient="from-yellow-400 to-orange-400" />
+          <StatBar label="Smarts" value={character.smartness} gradient="from-blue-400 to-cyan-400" />
+          <StatBar label="Looks" value={character.appearance} gradient="from-pink-400 to-rose-400" />
+          <StatBar label="Fitness" value={character.fitness} gradient="from-red-400 to-pink-400" />
           <FinancialStatBar label="Expenses/mo" value={totalMonthlyExpenses} color="text-red-400" />
         </div>
       </div>
 
       {/* Content Area */}
-      <div className="flex-grow overflow-y-auto pb-20 px-2 sm:px-4 pt-3">
+      <div className="flex-grow overflow-y-auto pb-24 px-2 sm:px-4 pt-2">
         {renderContent()}
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur-sm border-t border-slate-600 px-2 py-1.5 shadow-2xl">
+      {/* Bottom Navigation - Windows 11 Style */}
+      <div className="fixed bottom-0 left-0 right-0 acrylic-card border-t border-white/10 px-3 py-2 shadow-2xl">
         <div className="flex justify-around items-center">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as any)}
-              className={`flex flex-col items-center p-2 rounded-lg transition-all duration-300 w-1/5
+              className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 w-1/5 fluent-hover
                 ${ activeTab === item.id
-                    ? 'bg-gradient-to-t from-blue-600 to-purple-600 text-white scale-105 shadow-lg'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                    ? 'win11-button text-white shadow-lg scale-105'
+                    : 'text-white/60 hover:text-white hover:bg-white/10 ios-button'
                 }`}
               title={item.label}
             >
-              <item.icon size={20} />
-              <span className="text-[10px] mt-0.5 font-medium">{item.label}</span>
+              <item.icon size={22} />
+              <span className="text-[10px] mt-1 font-medium">{item.label}</span>
             </button>
           ))}
         </div>
       </div>
 
+      {/* BitLife-style Event Overlay */}
+      <BitLifeEventOverlay
+        event={currentBitLifeEvent}
+        isOpen={showBitLifeEvent}
+        onChoice={handleBitLifeEventChoice}
+        onClose={() => {
+          setShowBitLifeEvent(false);
+          setCurrentBitLifeEvent(null);
+        }}
+      />
+
+      {/* Keep existing MajorEventDialog */}
       <MajorEventDialog
         isOpen={showEventDialog}
         event={currentMajorEvent}
@@ -439,15 +501,15 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
   );
 };
 
-const StatBar = ({ label, value, color }: { label: string; value: number; color: string }) => (
-  <div className="space-y-0.5">
+const StatBar = ({ label, value, gradient }: { label: string; value: number; gradient: string }) => (
+  <div className="space-y-1">
     <div className="flex justify-between text-xs">
-      <span className="text-slate-300">{label}</span>
+      <span className="text-white/70">{label}</span>
       <span className="text-white font-medium">{value}%</span>
     </div>
-    <div className="w-full bg-slate-700 rounded-full h-1.5">
+    <div className="progress-bar h-2">
       <div
-        className={`h-1.5 rounded-full transition-all duration-300 ${color}`}
+        className={`progress-fill bg-gradient-to-r ${gradient}`}
         style={{ width: `${Math.min(value, 100)}%` }}
       />
     </div>

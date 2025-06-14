@@ -15,33 +15,33 @@ const FriendsCard = ({ character }: FriendsCardProps) => {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-yellow-900/50 to-orange-900/50 border-yellow-700/50 shadow-lg">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-white flex items-center gap-2">
-          <Users className="w-5 h-5 text-yellow-400" />
+    <div className="mica-card p-4 border border-white/10">
+      <div className="flex items-center gap-3 mb-4">
+        <Users className="w-6 h-6 text-yellow-400" />
+        <h3 className="text-white font-semibold text-lg">
           Friends ({friends.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2 max-h-48 overflow-y-auto">
+        </h3>
+      </div>
+      <div className="space-y-3 max-h-48 overflow-y-auto">
         {friends.map(friend => (
-          <div key={friend.id} className="flex justify-between items-center p-2 bg-slate-700/50 rounded border border-slate-600">
+          <div key={friend.id} className="glass-card p-3 border border-white/10 fluent-hover">
             <div className="flex-1">
-              <p className="text-white text-sm">{friend.name}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-slate-400 text-xs">Friendship:</span>
-                <div className="flex-1 bg-slate-600 rounded-full h-1">
+              <p className="text-white font-medium">{friend.name}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-white/60 text-sm">Friendship:</span>
+                <div className="flex-1 progress-bar h-2">
                   <div 
-                    className="bg-yellow-400 h-1 rounded-full"
+                    className="progress-fill bg-gradient-to-r from-yellow-400 to-orange-400"
                     style={{ width: `${friend.relationshipLevel}%` }}
                   />
                 </div>
-                <span className="text-slate-400 text-xs">{friend.relationshipLevel}%</span>
+                <span className="text-white/80 text-sm font-medium">{friend.relationshipLevel}%</span>
               </div>
             </div>
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
