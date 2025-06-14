@@ -58,6 +58,24 @@
     @apply bg-background text-foreground;
     background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
     min-height: 100vh;
+    /* Prevent zoom on iOS */
+    touch-action: manipulation;
+  }
+
+  /* Mobile-first responsive design */
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px;
+    }
+  }
+
+  /* Safe area support for mobile devices */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
   }
 
   /* iOS 26 Glass Card Style */
@@ -96,8 +114,16 @@
   }
 
   .fluent-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Mobile-optimized hover effects */
+  @media (hover: hover) {
+    .fluent-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
   }
 
   /* iOS 26 Button Styles */
@@ -128,6 +154,15 @@
     background: linear-gradient(135deg, #106ebe 0%, #005a9e 100%);
     box-shadow: 0 4px 12px rgba(16, 110, 190, 0.3);
   }
+
+  /* Mobile touch improvements */
+  .win11-button:active {
+    transform: scale(0.95);
+  }
+
+  .ios-button:active {
+    transform: scale(0.95);
+  }
 }
 
 /* BitLife-style Event Overlay */
@@ -144,6 +179,7 @@
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.3s ease-out;
+  padding: 20px;
 }
 
 .event-card {
@@ -153,9 +189,20 @@
   border-radius: 24px;
   padding: 32px;
   max-width: 400px;
-  width: 90%;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Mobile-specific event card adjustments */
+@media (max-width: 768px) {
+  .event-card {
+    padding: 24px;
+    margin: 10px;
+    border-radius: 20px;
+  }
 }
 
 @keyframes fadeIn {
@@ -187,4 +234,20 @@
   height: 100%;
   border-radius: 8px;
   transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Mobile scrollbar styling */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
 }

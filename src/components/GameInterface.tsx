@@ -423,56 +423,47 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
   };
 
   return (
-    <div className="min-h-screen text-white flex flex-col relative overflow-hidden">
+    <div className="min-h-screen text-white flex flex-col relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Toaster />
       
-      {/* Stats Header - iOS 26 Style */}
+      {/* Mobile-First Stats Header */}
       <div className="glass-card m-2 p-3 shadow-lg sticky top-2 z-10 border border-white/20">
-        <div className="text-center mb-3">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+        <div className="text-center">
+          <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             {character.name}
           </h1>
-          <p className="text-white/70 text-sm">
-            Age {character.age} • ${character.money.toLocaleString()} • {getCurrentLifeStage(character.age).name}
+          <p className="text-white/70 text-xs">
+            ${character.money.toLocaleString()}
           </p>
           {character.currentEducation && (
             <p className="text-blue-400 text-xs italic mt-1">
-              📚 Studying {character.currentEducation} ({character.educationYearsLeft} yrs left)
+              📚 {character.currentEducation} ({character.educationYearsLeft} yrs)
             </p>
           )}
         </div>
-        
-        <div className="grid grid-cols-3 gap-x-3 gap-y-2 text-xs">
-          <StatBar label="Health" value={character.health} gradient="from-green-400 to-emerald-400" />
-          <StatBar label="Happiness" value={character.happiness} gradient="from-yellow-400 to-orange-400" />
-          <StatBar label="Smarts" value={character.smartness} gradient="from-blue-400 to-cyan-400" />
-          <StatBar label="Looks" value={character.appearance} gradient="from-pink-400 to-rose-400" />
-          <StatBar label="Fitness" value={character.fitness} gradient="from-red-400 to-pink-400" />
-          <FinancialStatBar label="Expenses/mo" value={totalMonthlyExpenses} color="text-red-400" />
-        </div>
       </div>
 
-      {/* Content Area */}
-      <div className="flex-grow overflow-y-auto pb-24 px-2 sm:px-4 pt-2">
+      {/* Content Area - Mobile Optimized */}
+      <div className="flex-grow overflow-y-auto pb-20">
         {renderContent()}
       </div>
 
-      {/* Bottom Navigation - Windows 11 Style */}
-      <div className="fixed bottom-0 left-0 right-0 acrylic-card border-t border-white/10 px-3 py-2 shadow-2xl">
+      {/* Bottom Navigation - Mobile First */}
+      <div className="fixed bottom-0 left-0 right-0 mica-card border-t border-white/10 px-2 py-2 shadow-2xl safe-area-bottom">
         <div className="flex justify-around items-center">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as any)}
-              className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 w-1/5 fluent-hover
+              className={`flex flex-col items-center p-2 rounded-xl transition-all duration-300 flex-1 max-w-20 fluent-hover
                 ${ activeTab === item.id
                     ? 'win11-button text-white shadow-lg scale-105'
                     : 'text-white/60 hover:text-white hover:bg-white/10 ios-button'
                 }`}
               title={item.label}
             >
-              <item.icon size={22} />
-              <span className="text-[10px] mt-1 font-medium">{item.label}</span>
+              <item.icon size={20} />
+              <span className="text-[10px] mt-1 font-medium leading-tight">{item.label}</span>
             </button>
           ))}
         </div>
@@ -500,31 +491,5 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
     </div>
   );
 };
-
-const StatBar = ({ label, value, gradient }: { label: string; value: number; gradient: string }) => (
-  <div className="space-y-1">
-    <div className="flex justify-between text-xs">
-      <span className="text-white/70">{label}</span>
-      <span className="text-white font-medium">{value}%</span>
-    </div>
-    <div className="progress-bar h-2">
-      <div
-        className={`progress-fill bg-gradient-to-r ${gradient}`}
-        style={{ width: `${Math.min(value, 100)}%` }}
-      />
-    </div>
-  </div>
-);
-
-const FinancialStatBar = ({ label, value, color }: { label: string; value: number; color: string }) => (
-  <div className="space-y-0.5">
-    <div className="flex justify-between text-xs">
-      <span className="text-slate-300">{label}</span>
-      <span className={`${color} font-medium`}>${value.toLocaleString()}</span>
-    </div>
-     <div className="w-full bg-slate-700 rounded-full h-1.5">
-    </div>
-  </div>
-);
 
 export default GameInterface;
