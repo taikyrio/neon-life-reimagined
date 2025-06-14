@@ -16,12 +16,49 @@ const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
   const [name, setName] = useState('');
   const [gender, setGender] = useState('male');
 
+  // Random name generation
+  const maleFirstNames = [
+    'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Christopher',
+    'Charles', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua',
+    'Kenneth', 'Kevin', 'Brian', 'George', 'Timothy', 'Ronald', 'Jason', 'Edward', 'Jeffrey', 'Ryan'
+  ];
+
+  const femaleFirstNames = [
+    'Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan', 'Jessica', 'Sarah', 'Karen',
+    'Lisa', 'Nancy', 'Betty', 'Helen', 'Sandra', 'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle',
+    'Laura', 'Sarah', 'Kimberly', 'Deborah', 'Dorothy', 'Lisa', 'Nancy', 'Karen', 'Betty', 'Helen'
+  ];
+
+  const lastNames = [
+    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez',
+    'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
+    'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson'
+  ];
+
+  const getRandomName = (namesArray: string[]) => {
+    return namesArray[Math.floor(Math.random() * namesArray.length)];
+  };
+
+  const generateRandomCharacterName = (selectedGender: string) => {
+    const firstName = selectedGender === 'male' 
+      ? getRandomName(maleFirstNames) 
+      : getRandomName(femaleFirstNames);
+    const lastName = getRandomName(lastNames);
+    return `${firstName} ${lastName}`;
+  };
+
+  const generateRandomButton = () => {
+    const randomName = generateRandomCharacterName(gender);
+    setName(randomName);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
     const stats = generateRandomStats();
     const personalityTraits = generateRandomPersonality();
+    const characterLastName = name.split(' ').pop() || getRandomName(lastNames);
     
     const newCharacter: Character = {
       id: Math.random().toString(36).substr(2, 9),
@@ -72,7 +109,7 @@ const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
       personalityTraits,
       
       // Relationships
-      family: generateFamily(gender as 'male' | 'female'),
+      family: generateFamily(gender as 'male' | 'female', characterLastName),
       relationships: [],
       children: [],
       
@@ -105,14 +142,14 @@ const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
     };
   };
 
-  const generateFamily = (gender: 'male' | 'female') => {
-    const fatherName = gender === 'male' ? 'John Doe Sr.' : 'John Doe';
-    const motherName = gender === 'male' ? 'Jane Doe' : 'Jane Doe Sr.';
+  const generateFamily = (selectedGender: 'male' | 'female', lastName: string) => {
+    const fatherFirstName = getRandomName(maleFirstNames);
+    const motherFirstName = getRandomName(femaleFirstNames);
     
     return [
       {
         id: '1',
-        name: fatherName,
+        name: `${fatherFirstName} ${lastName}`,
         relationship: 'father' as const,
         age: Math.floor(Math.random() * 15) + 25, // 25-40
         alive: true,
@@ -120,7 +157,7 @@ const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
       },
       {
         id: '2',
-        name: motherName,
+        name: `${motherFirstName} ${lastName}`,
         relationship: 'mother' as const,
         age: Math.floor(Math.random() * 15) + 25, // 25-40
         alive: true,
@@ -140,14 +177,23 @@ const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-white font-medium">Character Name</Label>
-              <Input
-                id="name"
-                placeholder="Enter your character's name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-slate-700/80 border-slate-500 text-white placeholder:text-slate-400 focus:border-blue-400 transition-colors"
-                required
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="name"
+                  placeholder="Enter your character's name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-slate-700/80 border-slate-500 text-white placeholder:text-slate-400 focus:border-blue-400 transition-colors flex-1"
+                  required
+                />
+                <Button
+                  type="button"
+                  onClick={generateRandomButton}
+                  className="bg-slate-600 hover:bg-slate-500 text-white px-3 py-2 text-sm"
+                >
+                  Random
+                </Button>
+              </div>
             </div>
             
             <div className="space-y-3">
