@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+// Removed: import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -31,7 +32,7 @@ const formSchema = z.object({
 const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacterCreate }) => {
   const [name, setName] = useState('');
   const [gender, setGender] = useState<'male' | 'female'>('male');
-  const router = useRouter();
+  // Removed: const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,8 +65,8 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacterCreate
       education: 'High School Diploma',
       job: 'Unemployed',
       salary: 0,
-      housing: 'Living with Parents', // Default housing
-      careerLevel: 0, // Default career level
+      housing: 'Living with Parents', 
+      careerLevel: 0,
       family: [
         { id: 'f1', name: `John ${name.split(' ').pop()}`, relationship: 'father', age: 45, alive: true, relationshipLevel: 70 },
         { id: 'm1', name: `Jane ${name.split(' ').pop()}`, relationship: 'mother', age: 43, alive: true, relationshipLevel: 75 },
@@ -81,16 +82,15 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacterCreate
       achievements: [],
       criminalRecord: [],
       assets: [],
-      pendingEvents: [], // Initialize pendingEvents
-      // monthlyExpenses is calculated dynamically, so not set here
+      pendingEvents: [],
     };
     onCharacterCreate(newCharacter);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
-        <h2 className="text-2xl text-center mb-4">Create Your Character</h2>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900">
+      <div className="bg-slate-800 shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md border border-slate-700">
+        <h2 className="text-2xl text-center mb-6 text-white">Create Your Character</h2>
         <Form {...form}>
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormField
@@ -98,9 +98,18 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacterCreate
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="text-slate-300">Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your character's name" {...field} value={name} onChange={(e) => setName(e.target.value)} />
+                    <Input 
+                      placeholder="Enter your character's name" 
+                      {...field} 
+                      value={name} 
+                      onChange={(e) => {
+                        field.onChange(e);
+                        setName(e.target.value);
+                      }} 
+                      className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,24 +119,42 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacterCreate
               control={form.control}
               name="gender"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between space-y-0 rounded-md border p-4">
-                  <div>
-                    <FormLabel>Gender</FormLabel>
-                  </div>
-                  <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-2">
-                    <FormItem>
-                      <RadioGroupItem value="male" id="r1"  onClick={() => setGender('male')}/>
-                      <FormLabel htmlFor="r1">Male</FormLabel>
-                    </FormItem>
-                    <FormItem>
-                      <RadioGroupItem value="female" id="r2" onClick={() => setGender('female')}/>
-                      <FormLabel htmlFor="r2">Female</FormLabel>
-                    </FormItem>
-                  </RadioGroup>
+                <FormItem className="space-y-3">
+                   <FormLabel className="text-slate-300">Gender</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setGender(value as 'male' | 'female');
+                      }}
+                      defaultValue={field.value}
+                      className="flex space-x-2"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="male" id="male" className="text-sky-400 border-slate-600"/>
+                        </FormControl>
+                        <FormLabel htmlFor="male" className="font-normal text-slate-300">
+                          Male
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="female" id="female" className="text-pink-400 border-slate-600" />
+                        </FormControl>
+                        <FormLabel htmlFor="female" className="font-normal text-slate-300">
+                          Female
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">Create Character</Button>
+            <Button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white">
+              Start Life
+            </Button>
           </form>
         </Form>
       </div>
@@ -136,3 +163,4 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacterCreate
 };
 
 export default CharacterCreation;
+

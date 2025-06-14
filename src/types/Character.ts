@@ -1,4 +1,5 @@
-import { Asset } from './Asset'; // Make sure Asset is imported
+
+import { Asset as ImportedAsset } from './Asset'; // Renamed import to avoid conflict during transition, will use ImportedAsset
 
 export interface Character {
   id: string;
@@ -26,9 +27,6 @@ export interface Character {
   educationYearsLeft?: number;
   careerLevel: number; // Index or level within a career path
   
-  // Financials - monthlyExpenses will be dynamically calculated
-  // monthlyExpenses: number; // This will be calculated based on housing, assets, etc.
-  
   // Relationships
   family: FamilyMember[];
   relationships: Relationship[];
@@ -44,7 +42,7 @@ export interface Character {
   criminalRecord: CrimeRecord[];
   
   // Assets
-  assets: Asset[]; // Character's owned assets
+  assets: ImportedAsset[]; // Character's owned assets, using the imported type
 }
 
 export interface FamilyMember {
@@ -81,15 +79,16 @@ export interface CrimeRecord {
   punishment?: string;
 }
 
-export interface Asset {
-  id: string;
-  name: string;
-  type: 'vehicle' | 'property' | 'luxury';
-  value: number;
-  purchaseYear: number;
-  monthlyIncome: number;
-  monthlyMaintenance: number;
-}
+// Removed the local Asset interface definition that was causing a conflict.
+// export interface Asset {
+//   id: string;
+//   name: string;
+//   type: 'vehicle' | 'property' | 'luxury';
+//   value: number;
+//   purchaseYear: number;
+//   monthlyIncome: number;
+//   monthlyMaintenance: number;
+// }
 
 export interface PendingEvent {
   id: string;
@@ -99,7 +98,7 @@ export interface PendingEvent {
 }
 
 // Helper function to calculate total monthly expenses (can be moved to a utility file later)
-export const calculateTotalMonthlyExpenses = (character: Character, housingOptions: any[], assetList: Asset[]): number => {
+export const calculateTotalMonthlyExpenses = (character: Character, housingOptions: any[], assetList: ImportedAsset[]): number => {
   let totalExpenses = 0;
 
   // Housing expenses
@@ -128,3 +127,4 @@ export const calculateTotalMonthlyAssetIncome = (character: Character): number =
   });
   return totalIncome;
 };
+

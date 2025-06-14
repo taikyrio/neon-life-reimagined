@@ -16,7 +16,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-slate-900">
       {!gameStarted ? (
-        <CharacterCreation onCharacterCreated={handleCharacterCreated} />
+        <CharacterCreation onCharacterCreate={handleCharacterCreated} /> 
       ) : (
         character && <GameInterface character={character} setCharacter={setCharacter} />
       )}
@@ -25,3 +25,4 @@ const Index = () => {
 };
 
 export default Index;
+
