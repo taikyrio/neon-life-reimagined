@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +37,9 @@ const CharacterCreation = ({ onCharacterCreated }: CharacterCreationProps) => {
       education: 'None',
       job: 'Unemployed',
       salary: 0,
+      housing: 'Living with Parents',
+      careerLevel: 0,
+      monthlyExpenses: 0,
       family: [
         {
           id: '1',
@@ -64,6 +66,7 @@ const CharacterCreation = ({ onCharacterCreated }: CharacterCreationProps) => {
         event: `${name} was born!`,
         type: 'positive'
       }],
+      pendingEvents: [],
       achievements: [],
       criminalRecord: [],
       assets: []
