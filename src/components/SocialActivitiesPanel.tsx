@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Character } from '../types/Character';
 import { SOCIAL_ACTIVITIES, SocialActivity, calculateAttractiveness, generateRandomPersonality, PERSONALITY_TRAITS } from '../types/SocialSystem';
-import { Heart, Users, Star, Baby, Ring } from 'lucide-react';
+import { Heart, Users, Star, Baby, Heart as RingIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SocialActivitiesPanelProps {
@@ -90,24 +90,40 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
   const friends = character.relationships.filter(r => r.type === 'friend');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-4">
       {/* Social Status Overview */}
-      <Card className="bg-slate-800/70 border-slate-700">
+      <Card className="bg-gradient-to-br from-slate-800/90 to-slate-700/90 border-slate-600 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-white flex items-center gap-2">
-            <Star className="w-5 h-5" />
+            <Star className="w-5 h-5 text-yellow-400" />
             Social Status
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
+            <div className="space-y-1">
               <p className="text-slate-400">Reputation</p>
-              <p className="text-white font-semibold">{character.socialStatus.reputation}%</p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 bg-slate-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all"
+                    style={{ width: `${character.socialStatus.reputation}%` }}
+                  />
+                </div>
+                <p className="text-white font-semibold">{character.socialStatus.reputation}%</p>
+              </div>
             </div>
-            <div>
+            <div className="space-y-1">
               <p className="text-slate-400">Popularity</p>
-              <p className="text-white font-semibold">{character.socialStatus.popularity}%</p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 bg-slate-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-pink-500 to-red-500 h-2 rounded-full transition-all"
+                    style={{ width: `${character.socialStatus.popularity}%` }}
+                  />
+                </div>
+                <p className="text-white font-semibold">{character.socialStatus.popularity}%</p>
+              </div>
             </div>
             <div>
               <p className="text-slate-400">Social Class</p>
@@ -125,7 +141,7 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
             <p className="text-slate-400 text-sm mb-2">Personality Traits</p>
             <div className="flex flex-wrap gap-1">
               {character.personalityTraits.map(trait => (
-                <Badge key={trait} variant="secondary" className="text-xs">
+                <Badge key={trait} variant="secondary" className="text-xs bg-slate-600 text-slate-200 hover:bg-slate-500">
                   {trait}
                 </Badge>
               ))}
@@ -135,42 +151,67 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
       </Card>
 
       {/* Dating & Marriage */}
-      <Card className="bg-slate-800/70 border-slate-700">
+      <Card className="bg-gradient-to-br from-pink-900/50 to-red-900/50 border-pink-700/50 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-white flex items-center gap-2">
-            <Heart className="w-5 h-5" />
+            <Heart className="w-5 h-5 text-pink-400" />
             Romance & Marriage
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {character.marriageStatus.isMarried ? (
-            <div className="p-3 bg-pink-900/30 rounded-lg border border-pink-700">
-              <p className="text-pink-300 font-semibold">Married</p>
-              <p className="text-white text-sm">Marriage Happiness: {character.marriageStatus.marriageHappiness}%</p>
-              <p className="text-slate-400 text-xs">Married since {character.marriageStatus.marriageYear}</p>
+            <div className="p-3 bg-pink-900/30 rounded-lg border border-pink-700/50">
+              <p className="text-pink-300 font-semibold flex items-center gap-2">
+                <RingIcon className="w-4 h-4" />
+                Married
+              </p>
+              <div className="mt-2 space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-slate-300 text-sm">Marriage Happiness:</span>
+                  <span className="text-white">{character.marriageStatus.marriageHappiness}%</span>
+                </div>
+                <div className="bg-slate-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-pink-500 to-red-500 h-2 rounded-full"
+                    style={{ width: `${character.marriageStatus.marriageHappiness}%` }}
+                  />
+                </div>
+              </div>
+              <p className="text-slate-400 text-xs mt-2">Married since {character.marriageStatus.marriageYear}</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              <p className="text-slate-400 text-sm">
-                Attractiveness: {calculateAttractiveness(character.appearance, character.personalityTraits, character.socialStatus.reputation)}%
-              </p>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400 text-sm">Attractiveness:</span>
+                <span className="text-pink-300 font-medium">
+                  {calculateAttractiveness(character.appearance, character.personalityTraits, character.socialStatus.reputation)}%
+                </span>
+              </div>
               
               {romanticPartners.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-slate-300 text-sm font-medium">Romantic Partners:</p>
                   {romanticPartners.map(partner => (
-                    <div key={partner.id} className="flex justify-between items-center p-2 bg-slate-700/50 rounded">
+                    <div key={partner.id} className="flex justify-between items-center p-2 bg-slate-700/50 rounded border border-slate-600">
                       <div>
                         <p className="text-white text-sm">{partner.name}</p>
-                        <p className="text-slate-400 text-xs">Relationship: {partner.relationshipLevel}%</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-slate-600 rounded-full h-1 w-16">
+                            <div 
+                              className="bg-pink-400 h-1 rounded-full"
+                              style={{ width: `${partner.relationshipLevel}%` }}
+                            />
+                          </div>
+                          <span className="text-slate-400 text-xs">{partner.relationshipLevel}%</span>
+                        </div>
                       </div>
                       {partner.relationshipLevel >= 80 && (
                         <Button
                           size="sm"
                           onClick={() => proposeMarriage(partner.id)}
-                          className="bg-pink-600 hover:bg-pink-700"
+                          className="bg-pink-600 hover:bg-pink-700 text-xs"
                         >
-                          <Ring className="w-4 h-4 mr-1" />
+                          <RingIcon className="w-3 h-3 mr-1" />
                           Propose
                         </Button>
                       )}
@@ -181,7 +222,7 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
               
               <Button
                 onClick={startDating}
-                className="w-full bg-pink-600 hover:bg-pink-700"
+                className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700"
                 disabled={character.age < 16}
               >
                 {character.age < 16 ? 'Too Young to Date' : 'Start Dating'}
@@ -192,10 +233,10 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
       </Card>
 
       {/* Family & Children */}
-      <Card className="bg-slate-800/70 border-slate-700">
+      <Card className="bg-gradient-to-br from-blue-900/50 to-indigo-900/50 border-blue-700/50 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-white flex items-center gap-2">
-            <Baby className="w-5 h-5" />
+            <Baby className="w-5 h-5 text-blue-400" />
             Family & Children
           </CardTitle>
         </CardHeader>
@@ -204,15 +245,24 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
             <div className="space-y-2">
               <p className="text-slate-300 text-sm font-medium">Your Children:</p>
               {character.children.map(child => (
-                <div key={child.id} className="p-2 bg-slate-700/50 rounded">
+                <div key={child.id} className="p-2 bg-slate-700/50 rounded border border-slate-600">
                   <p className="text-white text-sm">{child.name} ({child.gender}, {child.age} years old)</p>
-                  <p className="text-slate-400 text-xs">Relationship: {child.relationshipWithParent}%</p>
-                  {child.isAdopted && <Badge variant="outline" className="text-xs">Adopted</Badge>}
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-slate-400 text-xs">Relationship:</span>
+                    <div className="flex-1 bg-slate-600 rounded-full h-1">
+                      <div 
+                        className="bg-blue-400 h-1 rounded-full"
+                        style={{ width: `${child.relationshipWithParent}%` }}
+                      />
+                    </div>
+                    <span className="text-slate-400 text-xs">{child.relationshipWithParent}%</span>
+                  </div>
+                  {child.isAdopted && <Badge variant="outline" className="text-xs mt-1">Adopted</Badge>}
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-slate-400 text-sm">No children yet</p>
+            <p className="text-slate-400 text-sm text-center py-2">No children yet</p>
           )}
           
           <div className="grid grid-cols-2 gap-2">
@@ -229,6 +279,7 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
               disabled={character.age < 25 || character.money < 5000}
               size="sm"
               variant="outline"
+              className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
             >
               Adopt ($5,000)
             </Button>
@@ -237,10 +288,10 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
       </Card>
 
       {/* Social Activities */}
-      <Card className="bg-slate-800/70 border-slate-700">
+      <Card className="bg-gradient-to-br from-green-900/50 to-emerald-900/50 border-green-700/50 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-white flex items-center gap-2">
-            <Users className="w-5 h-5" />
+            <Users className="w-5 h-5 text-green-400" />
             Social Activities
           </CardTitle>
         </CardHeader>
@@ -249,12 +300,12 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
             <p className="text-slate-400 text-center py-4">No social activities available right now</p>
           ) : (
             availableActivities.map(activity => (
-              <div key={activity.id} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-blue-500 transition-all">
+              <div key={activity.id} className="p-3 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-green-500 transition-all">
                 <div className="flex justify-between items-start mb-2">
-                  <div>
+                  <div className="flex-1">
                     <h4 className="text-white font-semibold text-sm">{activity.name}</h4>
-                    <p className="text-slate-300 text-xs">{activity.description}</p>
-                    <Badge variant="outline" className="text-xs mt-1 capitalize">
+                    <p className="text-slate-300 text-xs mt-1">{activity.description}</p>
+                    <Badge variant="outline" className="text-xs mt-1 capitalize border-green-600 text-green-400">
                       {activity.type}
                     </Badge>
                   </div>
@@ -262,7 +313,7 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
                 </div>
                 <Button
                   onClick={() => performActivity(activity)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-sm py-1.5"
+                  className="w-full bg-green-600 hover:bg-green-700 text-sm py-1.5"
                 >
                   Participate
                 </Button>
@@ -274,16 +325,28 @@ const SocialActivitiesPanel = ({ character, onAction }: SocialActivitiesPanelPro
 
       {/* Friends List */}
       {friends.length > 0 && (
-        <Card className="bg-slate-800/70 border-slate-700">
+        <Card className="bg-gradient-to-br from-yellow-900/50 to-orange-900/50 border-yellow-700/50 shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-white">Friends ({friends.length})</CardTitle>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-yellow-400" />
+              Friends ({friends.length})
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 max-h-48 overflow-y-auto">
             {friends.map(friend => (
-              <div key={friend.id} className="flex justify-between items-center p-2 bg-slate-700/50 rounded">
-                <div>
+              <div key={friend.id} className="flex justify-between items-center p-2 bg-slate-700/50 rounded border border-slate-600">
+                <div className="flex-1">
                   <p className="text-white text-sm">{friend.name}</p>
-                  <p className="text-slate-400 text-xs">Friendship: {friend.relationshipLevel}%</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-slate-400 text-xs">Friendship:</span>
+                    <div className="flex-1 bg-slate-600 rounded-full h-1">
+                      <div 
+                        className="bg-yellow-400 h-1 rounded-full"
+                        style={{ width: `${friend.relationshipLevel}%` }}
+                      />
+                    </div>
+                    <span className="text-slate-400 text-xs">{friend.relationshipLevel}%</span>
+                  </div>
                 </div>
               </div>
             ))}

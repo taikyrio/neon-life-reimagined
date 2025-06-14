@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Character, calculateTotalMonthlyExpenses, calculateTotalMonthlyAssetIncome } from '../types/Character';
+import { Character, calculateTotalMonthlyExpenses, calculateTotalMonthlyAssetIncome, calculateSocialClass } from '../types/Character';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, User, Briefcase, Calendar, Menu as MenuIcon, TrendingUp, PiggyBank, Building } from 'lucide-react';
@@ -18,6 +18,7 @@ import { Toaster } from "@/components/ui/toaster";
 import TimelineView from './TimelineView';
 import AssetsPanel from './AssetsPanel';
 import ProfileView from './ProfileView';
+import SocialActivitiesPanel from './SocialActivitiesPanel';
 
 interface GameInterfaceProps {
   character: Character;
@@ -37,7 +38,6 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
     setTotalMonthlyExpenses(calculateTotalMonthlyExpenses(character, HOUSING_OPTIONS, character.assets));
     setTotalMonthlyAssetIncome(calculateTotalMonthlyAssetIncome(character));
   }, [character, character.housing, character.assets]);
-
 
   const ageUp = () => {
     setCharacter(prevCharacter => {
@@ -356,7 +356,6 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
     { id: 'assets', icon: PiggyBank, label: 'Assets' },
     { id: 'relationships', icon: Heart, label: 'Relations' },
     { id: 'profile', icon: User, label: 'Profile' },
-    // { id: 'settings', icon: SettingsIcon, label: 'Settings' } // Or MenuIcon for a generic menu
   ];
 
   const renderContent = () => {
@@ -368,21 +367,19 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
       case 'assets':
         return <AssetsPanel character={character} onAction={handleLifeStageAction} />;
       case 'relationships':
-        return <RelationshipsPanel character={character} setCharacter={setCharacter} />;
+        return <SocialActivitiesPanel character={character} onAction={handleLifeStageAction} />;
       case 'profile':
         return <ProfileView character={character} />;
-      // case 'settings':
-      //   return <SettingsPanel />;
       default:
         return <TimelineView character={character} onAgeUp={ageUp} onLifeStageAction={handleLifeStageAction} monthlyExpenses={totalMonthlyExpenses} monthlyAssetIncome={totalMonthlyAssetIncome} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white flex flex-col">
       <Toaster />
       {/* Stats Header - Always Visible */}
-      <div className="bg-slate-800 p-3 border-b border-slate-700 shadow-md sticky top-0 z-10">
+      <div className="bg-slate-800/90 backdrop-blur-sm p-3 border-b border-slate-600 shadow-lg sticky top-0 z-10">
         <div className="text-center mb-2">
           <h1 className="text-lg font-bold">{character.name}</h1>
           <p className="text-slate-300 text-xs">
@@ -396,11 +393,11 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         </div>
         
         <div className="grid grid-cols-3 gap-x-2 gap-y-1 text-xs">
-          <StatBar label="Health" value={character.health} color="bg-green-500" />
-          <StatBar label="Happiness" value={character.happiness} color="bg-yellow-500" />
-          <StatBar label="Smarts" value={character.smartness} color="bg-blue-500" />
-          <StatBar label="Looks" value={character.appearance} color="bg-pink-500" />
-          <StatBar label="Fitness" value={character.fitness} color="bg-red-500" />
+          <StatBar label="Health" value={character.health} color="bg-gradient-to-r from-green-500 to-emerald-500" />
+          <StatBar label="Happiness" value={character.happiness} color="bg-gradient-to-r from-yellow-500 to-orange-500" />
+          <StatBar label="Smarts" value={character.smartness} color="bg-gradient-to-r from-blue-500 to-cyan-500" />
+          <StatBar label="Looks" value={character.appearance} color="bg-gradient-to-r from-pink-500 to-rose-500" />
+          <StatBar label="Fitness" value={character.fitness} color="bg-gradient-to-r from-red-500 to-pink-500" />
           <FinancialStatBar label="Expenses/mo" value={totalMonthlyExpenses} color="text-red-400" />
         </div>
       </div>
@@ -411,21 +408,21 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-2 py-1.5 shadow-top">
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur-sm border-t border-slate-600 px-2 py-1.5 shadow-2xl">
         <div className="flex justify-around items-center">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as any)}
-              className={`flex flex-col items-center p-2 rounded-lg transition-all duration-200 w-1/5
+              className={`flex flex-col items-center p-2 rounded-lg transition-all duration-300 w-1/5
                 ${ activeTab === item.id
-                    ? 'bg-blue-600 text-white scale-105'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                    ? 'bg-gradient-to-t from-blue-600 to-purple-600 text-white scale-105 shadow-lg'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                 }`}
               title={item.label}
             >
               <item.icon size={20} />
-              <span className="text-[10px] mt-0.5">{item.label}</span>
+              <span className="text-[10px] mt-0.5 font-medium">{item.label}</span>
             </button>
           ))}
         </div>

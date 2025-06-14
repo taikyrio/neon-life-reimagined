@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,7 +113,7 @@ const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
       {
         id: '1',
         name: fatherName,
-        relationship: 'father',
+        relationship: 'father' as const,
         age: Math.floor(Math.random() * 15) + 25, // 25-40
         alive: true,
         relationshipLevel: Math.floor(Math.random() * 30) + 70, // 70-100
@@ -120,7 +121,7 @@ const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
       {
         id: '2',
         name: motherName,
-        relationship: 'mother',
+        relationship: 'mother' as const,
         age: Math.floor(Math.random() * 15) + 25, // 25-40
         alive: true,
         relationshipLevel: Math.floor(Math.random() * 30) + 70, // 70-100
@@ -129,48 +130,49 @@ const CharacterCreation = ({ onCharacterCreate }: CharacterCreationProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900">
-      <Card className="w-full max-w-md bg-slate-800 border-slate-700 shadow-xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-white">Create Your Character</CardTitle>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
+      <Card className="w-full max-w-md bg-slate-800/90 backdrop-blur-sm border-slate-600 shadow-2xl">
+        <CardHeader className="text-center pb-4">
+          <CardTitle className="text-3xl font-bold text-white mb-2">Create Your Character</CardTitle>
+          <p className="text-slate-300 text-sm">Begin your life simulation journey</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-white">Name</Label>
+              <Label htmlFor="name" className="text-white font-medium">Character Name</Label>
               <Input
                 id="name"
                 placeholder="Enter your character's name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-slate-700 border-slate-600 text-white"
+                className="bg-slate-700/80 border-slate-500 text-white placeholder:text-slate-400 focus:border-blue-400 transition-colors"
                 required
               />
             </div>
             
-            <div className="space-y-2">
-              <Label className="text-white">Gender</Label>
+            <div className="space-y-3">
+              <Label className="text-white font-medium">Gender</Label>
               <RadioGroup 
                 value={gender} 
                 onValueChange={setGender}
-                className="flex space-x-4"
+                className="flex space-x-6"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="male" id="male" />
-                  <Label htmlFor="male" className="text-white">Male</Label>
+                  <RadioGroupItem value="male" id="male" className="border-slate-400 text-blue-400" />
+                  <Label htmlFor="male" className="text-white cursor-pointer">Male</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="female" id="female" />
-                  <Label htmlFor="female" className="text-white">Female</Label>
+                  <RadioGroupItem value="female" id="female" className="border-slate-400 text-blue-400" />
+                  <Label htmlFor="female" className="text-white cursor-pointer">Female</Label>
                 </div>
               </RadioGroup>
             </div>
             
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105"
             >
-              Start Life
+              Start Life Journey
             </Button>
           </form>
         </CardContent>
