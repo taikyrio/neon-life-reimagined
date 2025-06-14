@@ -1,6 +1,6 @@
 
-import { Character, Asset as CharacterAsset } from '../types/Character'; // Renamed to avoid conflict if Asset type is also defined here
-import { ASSET_OPTIONS } from '../types/Asset'; // Ensure this is the correct Asset type from your definitions
+import { Character } from '../types/Character';
+import { ASSET_OPTIONS, Asset } from '../types/Asset'; // Ensure this is the correct Asset type from your definitions
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -10,7 +10,7 @@ interface AssetsPanelProps {
 }
 
 const AssetsPanel = ({ character, onAction }: AssetsPanelProps) => {
-  const totalAssetValue = character.assets.reduce((sum, asset) => sum + asset.currentValue, 0);
+  const totalAssetValue = character.assets.reduce((sum, asset: Asset) => sum + asset.currentValue, 0);
 
   return (
     <div className="space-y-4">
@@ -23,7 +23,7 @@ const AssetsPanel = ({ character, onAction }: AssetsPanelProps) => {
           {character.assets.length === 0 ? (
             <p className="text-slate-400 text-center py-4">You don't own any assets yet. Check "Actions" to acquire some!</p>
           ) : (
-            character.assets.map(asset => {
+            character.assets.map((asset: Asset) => {
               // Find the original asset details from ASSET_OPTIONS for full description, if needed
               const assetDetails = ASSET_OPTIONS.find(opt => opt.id === asset.id);
               return (
