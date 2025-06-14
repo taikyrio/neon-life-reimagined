@@ -4,6 +4,7 @@ import { getCurrentLifeStage } from '../types/LifeStages';
 import LifeStageActions from './LifeStageActions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface TimelineViewProps {
   character: Character;
@@ -83,39 +84,40 @@ const TimelineView = ({
         {/* Life Stage Actions */}
         <LifeStageActions character={character} onAction={onLifeStageAction} />
 
-        {/* Timeline - Similar to second photo */}
+        {/* Timeline - Scrollable Box */}
         <div className="mica-card p-4 border border-white/10">
           <h3 className="text-white font-semibold text-lg mb-3">Timeline</h3>
-          <div className="space-y-3 max-h-80 overflow-y-auto">
-            {character.lifeEvents.length === 0 && (
-              <p className="text-white/60 text-sm text-center py-4">No major events yet.</p>
-            )}
-            {character.lifeEvents
-              .slice()
-              .reverse()
-              .slice(0, 10)
-              .map((event, index) => (
-                <div key={event.id} className="flex items-start gap-3">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-3 h-3 rounded-full ${
-                      event.type === 'positive' ? 'bg-green-400' : 
-                      event.type === 'negative' ? 'bg-red-400' : 'bg-white/60'
-                    }`} />
-                    {index < character.lifeEvents.slice().reverse().slice(0, 10).length - 1 && (
-                      <div className="w-0.5 h-8 bg-white/20 mt-1" />
-                    )}
-                  </div>
-                  <div className="flex-1 pb-4">
-                    <div className="glass-card p-3 border border-white/10">
-                      <p className="text-white text-sm font-medium">{event.event}</p>
-                      <p className="text-white/60 text-xs mt-1">
-                        {event.year} - Age {event.age}
-                      </p>
+          <ScrollArea className="h-64 w-full rounded-md">
+            <div className="space-y-3 pr-4">
+              {character.lifeEvents.length === 0 && (
+                <p className="text-white/60 text-sm text-center py-8">No major events yet.</p>
+              )}
+              {character.lifeEvents
+                .slice()
+                .reverse()
+                .map((event, index) => (
+                  <div key={event.id} className="flex items-start gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className={`w-3 h-3 rounded-full ${
+                        event.type === 'positive' ? 'bg-green-400' : 
+                        event.type === 'negative' ? 'bg-red-400' : 'bg-white/60'
+                      }`} />
+                      {index < character.lifeEvents.length - 1 && (
+                        <div className="w-0.5 h-8 bg-white/20 mt-1" />
+                      )}
+                    </div>
+                    <div className="flex-1 pb-4">
+                      <div className="glass-card p-3 border border-white/10">
+                        <p className="text-white text-sm font-medium">{event.event}</p>
+                        <p className="text-white/60 text-xs mt-1">
+                          {event.year} - Age {event.age}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-          </div>
+                ))}
+            </div>
+          </ScrollArea>
         </div>
       </div>
 
