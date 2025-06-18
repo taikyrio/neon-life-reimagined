@@ -4,7 +4,7 @@ import { MAJOR_LIFE_EVENTS, MajorLifeEvent, EventChoice } from '../types/MajorEv
 import { ASSET_OPTIONS, Asset } from '../types/Asset';
 import { ECONOMIC_EVENTS } from '../types/EconomicEvent';
 import { HOUSING_OPTIONS } from '../types/Housing';
-import { generateRandomEventEnhanced, BitLifeEvent, EnhancedEvent } from '../types/BitLifeEvents';
+import { generateRandomEvent, BitLifeEvent, EnhancedEvent } from '../types/BitLifeEvents';
 import { checkAchievements } from '../types/Achievements';
 import { SKILL_DEFINITIONS } from '../types/Skills';
 import { CRIMES } from '../types/Crime';
@@ -302,11 +302,11 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
         age: member.age + 1,
       }));
       
-      // Enhanced event generation with history
+      // Enhanced event generation with history - now using unified system
       const eventHistory = newCharacter.lifeEvents || [];
       
       if (!showBitLifeEvent && !showEnhancedEvent && Math.random() < 0.35) {
-        const randomEvent = generateRandomEventEnhanced(newCharacter, eventHistory);
+        const randomEvent = generateRandomEvent(newCharacter, eventHistory);
         
         if (randomEvent) {
           // Check if it's an enhanced event or classic BitLife event
