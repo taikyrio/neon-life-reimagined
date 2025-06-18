@@ -16,6 +16,9 @@ export {
   DEFAULT_EVENT_CONFIG 
 } from './EventManager';
 
+// Import generateRandomEvent to fix the error
+import { generateRandomEvent } from './EventManager';
+
 // Legacy function for backward compatibility
 export const generateRandomEventEnhanced = (character: any, eventHistory: any[] = []) => {
   return generateRandomEvent(character, eventHistory);
