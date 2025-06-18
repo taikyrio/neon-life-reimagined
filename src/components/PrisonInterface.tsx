@@ -16,11 +16,16 @@ interface PrisonInterfaceProps {
 const PrisonInterface = ({ character, onAction }: PrisonInterfaceProps) => {
   const [currentEvent, setCurrentEvent] = useState<PrisonEvent | null>(null);
   
-  const currentSentence = character.legalConsequences?.find(
-    lc => lc.status === 'active' && lc.type === 'sentence'
-  ) as PrisonSentence | undefined;
+  // Use the currentSentence from character directly
+  const currentSentence = character.currentSentence;
 
-  if (!currentSentence) return null;
+  if (!currentSentence || !character.isIncarcerated) {
+    return (
+      <div className="text-center p-8 text-white/60">
+        Not currently incarcerated
+      </div>
+    );
+  }
 
   const timeServed = currentSentence.originalSentenceYears - currentSentence.remainingSentenceYears;
   const progressPercent = (timeServed / currentSentence.originalSentenceYears) * 100;
