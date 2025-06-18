@@ -15,6 +15,7 @@ import EnhancedRelationships from './EnhancedRelationships';
 import AchievementsPanel from './AchievementsPanel';
 import CareerDevelopment from './CareerDevelopment';
 import CrimeActivities from './CrimeActivities';
+import PrisonInterface from './PrisonInterface';
 
 interface GameInterfaceProps {
   character: Character;
@@ -22,7 +23,7 @@ interface GameInterfaceProps {
 }
 
 const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
-  const [activeTab, setActiveTab] = useState<'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career' | 'crime'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'activities' | 'relationships' | 'assets' | 'profile' | 'achievements' | 'career' | 'crime' | 'prison'>('timeline');
   
   const {
     currentMajorEvent,
@@ -46,14 +47,21 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
     handleEnhancedEventChoice
   } = useGameLogic({ character, setCharacter });
 
+  // Override tab if character is incarcerated
+  const effectiveTab = character.isIncarcerated && activeTab !== 'prison' && activeTab !== 'profile' && activeTab !== 'timeline' ? 'prison' : activeTab;
+
   const renderContent = () => {
-    switch (activeTab) {
+    switch (effectiveTab) {
       case 'timeline':
         return <TimelineView character={character} onAgeUp={ageUp} onLifeStageAction={handleLifeStageAction} monthlyExpenses={totalMonthlyExpenses} monthlyAssetIncome={totalMonthlyAssetIncome} />;
       case 'activities':
-        return <LifeStageActions character={character} onAction={handleLifeStageAction} />;
+        return character.isIncarcerated ? 
+          <PrisonInterface character={character} onAction={handleLifeStageAction} /> :
+          <LifeStageActions character={character} onAction={handleLifeStageAction} />;
       case 'assets':
-        return <AssetsPanel character={character} onAction={handleLifeStageAction} />;
+        return character.isIncarcerated ? 
+          <div className="text-center p-8 text-white/60">Assets unavailable while incarcerated</div> :
+          <AssetsPanel character={character} onAction={handleLifeStageAction} />;
       case 'relationships':
         return <EnhancedRelationships character={character} setCharacter={setCharacter} />;
       case 'profile':
@@ -61,9 +69,17 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
       case 'achievements':
         return <AchievementsPanel character={character} />;
       case 'career':
-        return <CareerDevelopment character={character} onAction={handleLifeStageAction} />;
+        return character.isIncarcerated ? 
+          <div className="text-center p-8 text-white/60">Career unavailable while incarcerated</div> :
+          <CareerDevelopment character={character} onAction={handleLifeStageAction} />;
       case 'crime':
-        return <CrimeActivities character={character} onAction={handleLifeStageAction} />;
+        return character.isIncarcerated ? 
+          <PrisonInterface character={character} onAction={handleLifeStageAction} /> :
+          <CrimeActivities character={character} onAction={handleLifeStageAction} />;
+      case 'prison':
+        return character.isIncarcerated ? 
+          <PrisonInterface character={character} onAction={handleLifeStageAction} /> :
+          <div className="text-center p-8 text-white/60">Not currently incarcerated</div>;
       default:
         return <TimelineView character={character} onAgeUp={ageUp} onLifeStageAction={handleLifeStageAction} monthlyExpenses={totalMonthlyExpenses} monthlyAssetIncome={totalMonthlyAssetIncome} />;
     }
@@ -79,7 +95,11 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         {renderContent()}
       </div>
 
-      <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BottomNavigation 
+        activeTab={effectiveTab} 
+        setActiveTab={setActiveTab} 
+        isIncarcerated={character.isIncarcerated} 
+      />
 
       <EventHandlers
         character={character}

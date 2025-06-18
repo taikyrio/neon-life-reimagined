@@ -1,8 +1,8 @@
-
 import { Asset as ImportedAsset } from './Asset';
 import { SocialStatus, DatingProfile, MarriageStatus, Child } from './SocialSystem';
 import { Skill } from './Skills';
 import { LegalConsequence } from './Crime';
+import { PrisonSentence, PrisonRecord } from './PrisonSystem';
 
 export interface Character {
   id: string;
@@ -42,6 +42,11 @@ export interface Character {
   };
   legalConsequences?: LegalConsequence[];
   criminalOrganization?: string;
+  
+  // Prison System
+  isIncarcerated?: boolean;
+  currentSentence?: PrisonSentence;
+  prisonRecord?: PrisonRecord;
   
   // Social System
   socialStatus: SocialStatus;
@@ -114,6 +119,9 @@ export interface PendingEvent {
 
 // Helper functions
 export const calculateTotalMonthlyExpenses = (character: Character, housingOptions: any[], assetList: ImportedAsset[]): number => {
+  // Prison inmates have no housing expenses
+  if (character.isIncarcerated) return 0;
+  
   let totalExpenses = 0;
 
   const currentHousing = housingOptions.find(h => h.id === character.housing);
@@ -133,6 +141,9 @@ export const calculateTotalMonthlyExpenses = (character: Character, housingOptio
 };
 
 export const calculateTotalMonthlyAssetIncome = (character: Character): number => {
+  // Prison inmates cannot manage assets actively
+  if (character.isIncarcerated) return 0;
+  
   let totalIncome = 0;
   character.assets.forEach(asset => {
     totalIncome += asset.monthlyIncome;
