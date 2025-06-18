@@ -222,6 +222,19 @@ export const BITLIFE_EVENTS: BitLifeEvent[] = [
   }
 ];
 
+// Generate random classic BitLife event
+export const generateRandomEvent = (age: number): BitLifeEvent | null => {
+  const eligibleEvents = BITLIFE_EVENTS.filter(event => 
+    age >= event.minAge && 
+    age <= event.maxAge &&
+    Math.random() < event.probability
+  );
+  
+  if (eligibleEvents.length === 0) return null;
+  
+  return eligibleEvents[Math.floor(Math.random() * eligibleEvents.length)];
+};
+
 // Import enhanced events
 export { ENHANCED_EVENTS, generateEnhancedEvent, processEnhancedChoice } from './EnhancedEvents';
 export type { EnhancedEvent, EnhancedChoice, EventCategory } from './EnhancedEvents';

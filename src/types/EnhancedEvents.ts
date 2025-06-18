@@ -228,7 +228,7 @@ export const ENHANCED_EVENTS: EnhancedEvent[] = [
     baseProbability: 0.1,
     requirements: {
       money: { min: 10000 },
-      smartness: 50
+      stats: { smartness: 50 }
     },
     choices: [
       {
@@ -334,7 +334,7 @@ export const ENHANCED_EVENTS: EnhancedEvent[] = [
     maxAge: 18,
     baseProbability: 0.2,
     requirements: {
-      smartness: 80,
+      stats: { smartness: 80 },
       education: ['high_school']
     },
     oncePerLifetime: true,
