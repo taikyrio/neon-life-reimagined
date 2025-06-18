@@ -1,4 +1,3 @@
-
 export interface BitLifeEvent {
   id: string;
   title: string;
@@ -223,12 +222,19 @@ export const BITLIFE_EVENTS: BitLifeEvent[] = [
   }
 ];
 
-export const generateRandomEvent = (age: number): BitLifeEvent | null => {
-  const availableEvents = BITLIFE_EVENTS.filter(
-    event => age >= event.minAge && age <= event.maxAge && Math.random() < event.probability
-  );
+// Import enhanced events
+export { ENHANCED_EVENTS, generateEnhancedEvent, processEnhancedChoice } from './EnhancedEvents';
+export type { EnhancedEvent, EnhancedChoice, EventCategory } from './EnhancedEvents';
 
-  if (availableEvents.length === 0) return null;
+// Enhanced random event generation that combines both systems
+export const generateRandomEventEnhanced = (character: any, eventHistory: any[] = []): BitLifeEvent | EnhancedEvent | null => {
+  // 70% chance for enhanced events, 30% for classic BitLife events
+  const useEnhanced = Math.random() < 0.7;
   
-  return availableEvents[Math.floor(Math.random() * availableEvents.length)];
+  if (useEnhanced) {
+    const { generateEnhancedEvent } = require('./EnhancedEvents');
+    return generateEnhancedEvent(character, eventHistory);
+  } else {
+    return generateRandomEvent(character.age);
+  }
 };

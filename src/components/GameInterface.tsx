@@ -31,14 +31,19 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
     setShowEventDialog,
     currentBitLifeEvent,
     setCurrentBitLifeEvent,
+    currentEnhancedEvent,
+    setCurrentEnhancedEvent,
     showBitLifeEvent,
     setShowBitLifeEvent,
+    showEnhancedEvent,
+    setShowEnhancedEvent,
     totalMonthlyExpenses,
     totalMonthlyAssetIncome,
     ageUp,
     handleLifeStageAction,
     handleMajorEventChoice,
-    handleBitLifeEventChoice
+    handleBitLifeEventChoice,
+    handleEnhancedEventChoice
   } = useGameLogic({ character, setCharacter });
 
   const renderContent = () => {
@@ -81,11 +86,15 @@ const GameInterface = ({ character, setCharacter }: GameInterfaceProps) => {
         currentMajorEvent={currentMajorEvent}
         showEventDialog={showEventDialog}
         currentBitLifeEvent={currentBitLifeEvent}
+        currentEnhancedEvent={currentEnhancedEvent}
         showBitLifeEvent={showBitLifeEvent}
+        showEnhancedEvent={showEnhancedEvent}
         onMajorEventChoice={handleMajorEventChoice}
         onBitLifeEventChoice={handleBitLifeEventChoice}
+        onEnhancedEventChoice={handleEnhancedEventChoice}
         onMajorEventClose={() => { setShowEventDialog(false); setCurrentMajorEvent(null); }}
         onBitLifeEventClose={() => { setShowBitLifeEvent(false); setCurrentBitLifeEvent(null); }}
+        onEnhancedEventClose={() => { setShowEnhancedEvent(false); setCurrentEnhancedEvent(null); }}
       />
     </div>
   );

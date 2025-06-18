@@ -4,7 +4,7 @@ import { MAJOR_LIFE_EVENTS, MajorLifeEvent, EventChoice } from '../types/MajorEv
 import { ASSET_OPTIONS, Asset } from '../types/Asset';
 import { ECONOMIC_EVENTS } from '../types/EconomicEvent';
 import { HOUSING_OPTIONS } from '../types/Housing';
-import { generateRandomEvent, BitLifeEvent } from '../types/BitLifeEvents';
+import { generateRandomEventEnhanced, BitLifeEvent, EnhancedEvent } from '../types/BitLifeEvents';
 import { checkAchievements } from '../types/Achievements';
 import { SKILL_DEFINITIONS } from '../types/Skills';
 import { CRIMES } from '../types/Crime';
@@ -19,7 +19,9 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
   const [currentMajorEvent, setCurrentMajorEvent] = useState<MajorLifeEvent | null>(null);
   const [showEventDialog, setShowEventDialog] = useState(false);
   const [currentBitLifeEvent, setCurrentBitLifeEvent] = useState<BitLifeEvent | null>(null);
+  const [currentEnhancedEvent, setCurrentEnhancedEvent] = useState<EnhancedEvent | null>(null);
   const [showBitLifeEvent, setShowBitLifeEvent] = useState(false);
+  const [showEnhancedEvent, setShowEnhancedEvent] = useState(false);
   const [totalMonthlyExpenses, setTotalMonthlyExpenses] = useState(0);
   const [totalMonthlyAssetIncome, setTotalMonthlyAssetIncome] = useState(0);
   
@@ -300,11 +302,21 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
         age: member.age + 1,
       }));
       
-      if (!showBitLifeEvent && Math.random() < 0.3) {
-        const randomEvent = generateRandomEvent(newCharacter.age);
+      // Enhanced event generation with history
+      const eventHistory = newCharacter.lifeEvents || [];
+      
+      if (!showBitLifeEvent && !showEnhancedEvent && Math.random() < 0.35) {
+        const randomEvent = generateRandomEventEnhanced(newCharacter, eventHistory);
+        
         if (randomEvent) {
-          setCurrentBitLifeEvent(randomEvent);
-          setShowBitLifeEvent(true);
+          // Check if it's an enhanced event or classic BitLife event
+          if ('category' in randomEvent) {
+            setCurrentEnhancedEvent(randomEvent as EnhancedEvent);
+            setShowEnhancedEvent(true);
+          } else {
+            setCurrentBitLifeEvent(randomEvent as BitLifeEvent);
+            setShowBitLifeEvent(true);
+          }
         }
       }
       
@@ -558,6 +570,50 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
     setCurrentBitLifeEvent(null);
   };
 
+  const handleEnhancedEventChoice = (choice: any, effects: any, eventText: string) => {
+    setCharacter(prevCharacter => {
+      let newCharacter = { ...prevCharacter };
+      
+      // Apply effects
+      Object.entries(effects).forEach(([key, value]) => {
+        if (typeof value === 'number' && typeof (newCharacter as any)[key] === 'number') {
+          (newCharacter as any)[key] = Math.max(0, (newCharacter as any)[key] + value);
+          if (key !== 'money') {
+            (newCharacter as any)[key] = Math.min(100, (newCharacter as any)[key]);
+          }
+        }
+      });
+
+      // Add to life events with enhanced text
+      newCharacter.lifeEvents = [...newCharacter.lifeEvents, {
+        id: Math.random().toString(36).substr(2, 9),
+        year: newCharacter.birthYear + newCharacter.age,
+        age: newCharacter.age,
+        event: `${currentEnhancedEvent?.title}: ${eventText}`,
+        type: effects.happiness && effects.happiness > 0 ? 'positive' : 
+              effects.happiness && effects.happiness < 0 ? 'negative' : 'neutral'
+      }];
+
+      // Handle special triggers
+      if (choice.triggerEvents) {
+        // Store triggered events for future processing
+        newCharacter.pendingEvents = newCharacter.pendingEvents || [];
+        choice.triggerEvents.forEach((eventId: string) => {
+          newCharacter.pendingEvents.push({
+            id: Math.random().toString(36).substr(2, 9),
+            eventId,
+            triggerAge: newCharacter.age + 1
+          });
+        });
+      }
+
+      return newCharacter;
+    });
+    
+    setShowEnhancedEvent(false);
+    setCurrentEnhancedEvent(null);
+  };
+
   return {
     currentMajorEvent,
     setCurrentMajorEvent,
@@ -565,13 +621,18 @@ export const useGameLogic = ({ character, setCharacter }: UseGameLogicProps) => 
     setShowEventDialog,
     currentBitLifeEvent,
     setCurrentBitLifeEvent,
+    currentEnhancedEvent,
+    setCurrentEnhancedEvent,
     showBitLifeEvent,
     setShowBitLifeEvent,
+    showEnhancedEvent,
+    setShowEnhancedEvent,
     totalMonthlyExpenses,
     totalMonthlyAssetIncome,
     ageUp,
     handleLifeStageAction,
     handleMajorEventChoice,
-    handleBitLifeEventChoice
+    handleBitLifeEventChoice,
+    handleEnhancedEventChoice
   };
 };
